@@ -1,0 +1,119 @@
+import { pgTable, text, serial, timestamp, boolean, integer, date, primaryKey, uniqueIndex } from 'drizzle-orm/pg-core';
+
+export const users = pgTable('users', {
+    id: text('id').primaryKey(),
+    name: text('name').notNull(),
+    email: text('email').notNull().unique(),
+    emailVerified: boolean('email_verified').notNull(),
+    image: text('image'),
+    createdAt: timestamp('created_at').notNull(),
+    updatedAt: timestamp('updated_at').notNull(),
+});
+
+export const sessions = pgTable('sessions', {
+    id: text('id').primaryKey(),
+    expiresAt: timestamp('expires_at').notNull(),
+    token: text('token').notNull().unique(),
+    createdAt: timestamp('created_at').notNull(),
+    updatedAt: timestamp('updated_at').notNull(),
+    ipAddress: text('ip_address'),
+    userAgent: text('user_agent'),
+    userId: text('user_id').notNull().references(() => users.id),
+});
+
+export const accounts = pgTable('accounts', {
+    id: text('id').primaryKey(),
+    accountId: text('account_id').notNull(),
+    providerId: text('provider_id').notNull(),
+    userId: text('user_id').notNull().references(() => users.id),
+    accessToken: text('access_token'),
+    refreshToken: text('refresh_token'),
+    idToken: text('id_token'),
+    accessTokenExpiresAt: timestamp('access_token_expires_at'),
+    refreshTokenExpiresAt: timestamp('refresh_token_expires_at'),
+    scope: text('scope'),
+    password: text('password'),
+    createdAt: timestamp('created_at').notNull(),
+    updatedAt: timestamp('updated_at').notNull(),
+});
+
+export const verifications = pgTable('verifications', {
+    id: text('id').primaryKey(),
+    identifier: text('identifier').notNull(),
+    value: text('value').notNull(),
+    expiresAt: timestamp('expires_at').notNull(),
+    createdAt: timestamp('created_at'),
+    updatedAt: timestamp('updated_at'),
+});
+
+export const mediaItems = pgTable('media_items', {
+    id: serial('id').primaryKey(),
+    tmdbId: integer('tmdb_id').notNull(),
+    type: text('type').notNull(), // 'movie', 'tv'
+    title: text('title').notNull(),
+    originalTitle: text('original_title'),
+    overview: text('overview'),
+    posterPath: text('poster_path'),
+    backdropPath: text('backdrop_path'),
+    releaseDate: date('release_date'), // release_date for movies, first_air_date for tv
+    status: text('status'), // 'Released', 'Ended', 'Returning Series'
+    voteAverage: integer('vote_average'),
+    voteCount: integer('vote_count'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}, (t) => ({
+    unq: uniqueIndex('media_items_tmdb_id_type_unique').on(t.tmdbId, t.type),
+}));
+
+export const seasons = pgTable('seasons', {
+    id: serial('id').primaryKey(),
+    tmdbId: integer('tmdb_id').notNull(),
+    mediaItemId: integer('media_item_id').notNull().references(() => mediaItems.id, { onDelete: 'cascade' }),
+    seasonNumber: integer('season_number').notNull(),
+    name: text('name').notNull(),
+    overview: text('overview'),
+    posterPath: text('poster_path'),
+    airDate: date('air_date'),
+    episodeCount: integer('episode_count'),
+    voteAverage: integer('vote_average'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}, (t) => ({
+    unq: uniqueIndex('seasons_tmdb_id_unique').on(t.tmdbId),
+}));
+
+export const episodes = pgTable('episodes', {
+    id: serial('id').primaryKey(),
+    tmdbId: integer('tmdb_id').notNull(),
+    seasonId: integer('season_id').notNull().references(() => seasons.id, { onDelete: 'cascade' }),
+    episodeNumber: integer('episode_number').notNull(),
+    name: text('name').notNull(),
+    overview: text('overview'),
+    stillPath: text('still_path'),
+    airDate: date('air_date'),
+    voteAverage: integer('vote_average'),
+    voteCount: integer('vote_count'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}, (t) => ({
+    unq: uniqueIndex('episodes_tmdb_id_unique').on(t.tmdbId),
+}));
+
+export const ratings = pgTable('ratings', {
+    id: serial('id').primaryKey(),
+    userId: text('user_id').notNull().references(() => users.id),
+    mediaItemId: integer('media_item_id').notNull().references(() => mediaItems.id),
+    rating: integer('rating').notNull(), // 1-10 or 0.5-5.0 logic handled in app
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export const userProgress = pgTable('user_progress', {
+    id: serial('id').primaryKey(),
+    userId: text('user_id').notNull().references(() => users.id),
+    mediaItemId: integer('media_item_id').notNull().references(() => mediaItems.id),
+    status: text('status').notNull(), // 'watching', 'completed', 'plan_to_watch', 'dropped'
+    progress: integer('progress').default(0), // episode number or percentage
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});

@@ -1,0 +1,25 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import ProfileForm from "@/components/profile/ProfileForm.vue";
+
+const { user } = Astro.locals;
+
+if (!user) {
+    return Astro.redirect("/login");
+}
+---
+
+<Layout>
+    <div class="container max-w-2xl py-10">
+        <div class="space-y-6">
+            <div>
+                <h3 class="text-lg font-medium">Profile</h3>
+                <p class="text-sm text-muted-foreground">
+                    Manage your account settings and preferences.
+                </p>
+            </div>
+            <div class="h-px bg-border"></div>
+            <ProfileForm client:load />
+        </div>
+    </div>
+</Layout>

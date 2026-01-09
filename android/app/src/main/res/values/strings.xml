@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">tracktdb</string>
+    <string name="title_activity_main">tracktdb</string>
+    <string name="package_name">com.tracktdb.app</string>
+    <string name="custom_url_scheme">com.tracktdb.app</string>
+</resources>

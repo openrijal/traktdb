@@ -1,0 +1,23 @@
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+		<title>TracktDB</title>
+		<script is:inline>
+			if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+				document.documentElement.classList.add('dark')
+			} else {
+				document.documentElement.classList.remove('dark')
+			}
+		</script>
+	</head>
+	<body class="bg-background text-foreground antialiased selection:bg-primary selection:text-white">
+		<slot />
+	</body>
+</html>
+
+<style is:global>
+	@import "../styles/global.css";
+</style>
