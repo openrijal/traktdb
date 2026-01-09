@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { tmdb, type TMDBMediaItem } from '@/lib/tmdb';
+import { MediaType } from '@/lib/constants';
 import { db } from '@/lib/db';
 import { mediaItems } from 'drizzle/schema';
 import { sql } from 'drizzle-orm';
@@ -21,19 +22,19 @@ export const GET: APIRoute = async ({ request }) => {
 
         // Filter for movies and tv shows only
         const validResults = searchResults.results.filter(
-            (item) => item.media_type === 'movie' || item.media_type === 'tv'
+            (item) => item.media_type === MediaType.MOVIE || item.media_type === MediaType.TV
         );
 
         // Prepare data for upsert
         const valuesToInsert = validResults.map((item) => ({
             tmdbId: item.id,
-            type: item.media_type as 'movie' | 'tv',
+            type: item.media_type as MediaType,
             title: item.title || item.name || 'Unknown',
             originalTitle: item.original_title || item.original_name,
             overview: item.overview,
             posterPath: item.poster_path,
             backdropPath: item.backdrop_path,
-            releaseDate: item.release_date || item.first_air_date ? new Date(item.release_date || item.first_air_date!) : null,
+            releaseDate: item.release_date || item.first_air_date || null,
             voteAverage: Math.round(item.vote_average * 10), // Store as integer (e.g. 7.5 -> 75)
             voteCount: item.vote_count,
         }));

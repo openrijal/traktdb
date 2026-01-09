@@ -1,21 +1,41 @@
 
-export const TMDB_API_URL = 'https://api.themoviedb.org/3';
+import { TMDB_API_URL, MediaType } from './constants';
 
 export interface TMDBMediaItem {
   id: number;
-  media_type: 'movie' | 'tv' | 'person';
-  title?: string; // Movie
-  name?: string; // TV
-  original_title?: string;
-  original_name?: string;
+  media_type: MediaType | 'person';
   overview: string;
   poster_path?: string;
   backdrop_path?: string;
-  release_date?: string; // Movie
-  first_air_date?: string; // TV
   vote_average: number;
   vote_count: number;
   genre_ids?: number[];
+
+  // Optional Union Properties
+  title?: string;
+  name?: string;
+  original_title?: string;
+  original_name?: string;
+  status?: string;
+  release_date?: string;
+  first_air_date?: string;
+  last_air_date?: string;
+}
+
+export interface TMDBMovie extends TMDBMediaItem {
+  media_type: MediaType.MOVIE;
+  title: string;
+  original_title?: string;
+  release_date?: string;
+}
+
+export interface TMDBTVShow extends TMDBMediaItem {
+  media_type: MediaType.TV;
+  name: string;
+  original_name?: string;
+  first_air_date?: string;
+  last_air_date?: string;
+  seasons?: TMDBSeason[];
 }
 
 export interface TMDBSearchResult {
@@ -88,11 +108,11 @@ export const tmdb = {
   },
 
   async getMovie(id: number) {
-    return this.fetch<TMDBMediaItem>(`/movie/${id}`);
+    return this.fetch<TMDBMovie>(`/movie/${id}`);
   },
 
   async getTV(id: number) {
-    return this.fetch<TMDBMediaItem>(`/tv/${id}`);
+    return this.fetch<TMDBTVShow>(`/tv/${id}`);
   },
 
   async getSeason(tvId: number, seasonNumber: number) {

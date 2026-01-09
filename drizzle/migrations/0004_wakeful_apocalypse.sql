@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX "user_progress_user_media_unique" ON "user_progress" USING btree ("user_id","media_item_id");

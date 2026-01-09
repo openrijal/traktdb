@@ -56,6 +56,7 @@ export const mediaItems = pgTable('media_items', {
     posterPath: text('poster_path'),
     backdropPath: text('backdrop_path'),
     releaseDate: date('release_date'), // release_date for movies, first_air_date for tv
+    lastAirDate: date('last_air_date'), // for tv shows to track new episodes
     status: text('status'), // 'Released', 'Ended', 'Returning Series'
     voteAverage: integer('vote_average'),
     voteCount: integer('vote_count'),
@@ -116,4 +117,6 @@ export const userProgress = pgTable('user_progress', {
     progress: integer('progress').default(0), // episode number or percentage
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
-});
+}, (t) => ({
+    unq: uniqueIndex('user_progress_user_media_unique').on(t.userId, t.mediaItemId),
+}));

@@ -5,7 +5,7 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import * as schema from "../../drizzle/schema";
 
 import { db } from "./db";
-import * as schema from "../../drizzle/schema";
+
 
 // const sql = neon(import.meta.env.DATABASE_URL!); // Moved to db.ts
 // const db = drizzle(sql, { schema }); // Moved to db.ts

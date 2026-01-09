@@ -1,0 +1,64 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import MediaHeader from "@/components/media/MediaHeader.vue";
+
+const { type, id } = Astro.params;
+
+if (!type || !id || (type !== "movie" && type !== "tv")) {
+    return Astro.redirect("/404");
+}
+
+let mediaItem = null;
+let error = null;
+
+try {
+    const apiUrl = new URL(`/api/media/${type}/${id}`, Astro.url.origin);
+    const res = await fetch(apiUrl);
+
+    if (res.ok) {
+        mediaItem = await res.json();
+        // Inject type into the item for the component to use
+        mediaItem.type = type;
+    } else {
+        error = `Failed to load ${type}`;
+    }
+} catch (e) {
+    error = "An error occurred";
+    console.error(e);
+}
+---
+
+<Layout title={mediaItem ? mediaItem.title || mediaItem.name : "Loading..."}>
+    <main class="min-h-screen bg-gray-950 text-gray-100 pb-20">
+        {
+            error ? (
+                <div class="max-w-7xl mx-auto px-4 py-20 text-center">
+                    <h1 class="text-2xl font-bold text-red-500 mb-4">
+                        Error Loading Media
+                    </h1>
+                    <p class="text-gray-400">{error}</p>
+                    <a
+                        href="/search"
+                        class="mt-8 inline-block text-indigo-400 hover:text-indigo-300"
+                    >
+                        Back to Search
+                    </a>
+                </div>
+            ) : mediaItem ? (
+                <>
+                    <MediaHeader client:load media={mediaItem} />
+
+                    {/* Content Section (Seasons, Cast, etc. - Placeholder for now) */}
+                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                        {/* Debug Data Dump for Verification */}
+                        {/* <pre class="bg-gray-900 p-4 rounded overflow-auto text-xs opacity-50">{JSON.stringify(mediaItem, null, 2)}</pre> */}
+                    </div>
+                </>
+            ) : (
+                <div class="flex items-center justify-center min-h-[50vh]">
+                    <div class="animate-pulse text-gray-500">Loading...</div>
+                </div>
+            )
+        }
+    </main>
+</Layout>

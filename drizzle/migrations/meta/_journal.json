@@ -29,6 +29,20 @@
       "when": 1767958928633,
       "tag": "0003_marvelous_landau",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1767961304246,
+      "tag": "0004_wakeful_apocalypse",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1767961560604,
+      "tag": "0005_massive_thunderball",
+      "breakpoints": true
     }
   ]
 }
