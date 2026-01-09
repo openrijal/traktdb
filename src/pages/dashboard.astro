@@ -1,5 +1,5 @@
 ---
-import Layout from "@/layouts/Layout.astro";
+import AppLayout from "@/layouts/AppLayout.astro";
 import { useAuthStore } from "@/stores/auth";
 
 const { user } = Astro.locals;
@@ -9,7 +9,7 @@ if (!user) {
 }
 ---
 
-<Layout>
+<AppLayout>
     <div class="container py-10">
         <header class="mb-8 flex items-center justify-between">
             <h1 class="text-3xl font-bold tracking-tight">Dashboard</h1>
@@ -58,4 +58,4 @@ if (!user) {
             </div>
         </div>
     </div>
-</Layout>
+</AppLayout>

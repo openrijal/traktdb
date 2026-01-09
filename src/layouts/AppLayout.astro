@@ -1,0 +1,49 @@
+---
+import AppSidebar from "../components/layout/AppSidebar.vue";
+import AppHeader from "../components/layout/AppHeader.vue";
+
+const { user } = Astro.locals;
+const currentPath = Astro.url.pathname;
+---
+
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <meta name="generator" content={Astro.generator} />
+        <title>TracktDB</title>
+        <script is:inline>
+            if (
+                localStorage.theme === "dark" ||
+                (!("theme" in localStorage) &&
+                    window.matchMedia("(prefers-color-scheme: dark)").matches)
+            ) {
+                document.documentElement.classList.add("dark");
+            } else {
+                document.documentElement.classList.remove("dark");
+            }
+        </script>
+    </head>
+    <body
+        class="bg-background text-foreground antialiased selection:bg-primary selection:text-white overflow-hidden"
+    >
+        <div class="flex h-screen w-full">
+            <div class="hidden md:block">
+                <AppSidebar currentPath={currentPath} client:load />
+                <!-- Hydrate for active state/interactions -->
+            </div>
+
+            <div class="flex flex-col flex-1 h-full overflow-hidden">
+                <AppHeader user={user} client:load />
+                <main class="flex-1 overflow-y-auto p-6 scroll-smooth">
+                    <slot />
+                </main>
+            </div>
+        </div>
+    </body>
+</html>
+
+<style is:global>
+    @import "../styles/global.css";
+</style>

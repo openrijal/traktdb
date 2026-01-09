@@ -1,5 +1,5 @@
 ---
-import Layout from "../layouts/Layout.astro";
+import AppLayout from "@/layouts/AppLayout.astro";
 import MediaGrid from "@/components/media/MediaGrid.vue";
 import MediaCard from "@/components/media/MediaCard.vue";
 import { db } from "@/lib/db";
@@ -57,7 +57,7 @@ const currentTab = Astro.url.searchParams.get("tab") || LibraryTabs.WATCHLIST;
 const displayItems = currentTab === LibraryTabs.WATCHED ? completed : watchlist;
 ---
 
-<Layout title="My Library">
+<AppLayout>
     <main class="min-h-screen bg-gray-950 text-white pb-20">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <h1 class="text-3xl font-bold mb-8">My Library</h1>
@@ -114,4 +114,4 @@ const displayItems = currentTab === LibraryTabs.WATCHED ? completed : watchlist;
             }
         </div>
     </main>
-</Layout>
+</AppLayout>

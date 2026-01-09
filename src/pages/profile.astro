@@ -1,5 +1,5 @@
 ---
-import Layout from "@/layouts/Layout.astro";
+import AppLayout from "@/layouts/AppLayout.astro";
 import ProfileForm from "@/components/profile/ProfileForm.vue";
 
 const { user } = Astro.locals;
@@ -9,7 +9,7 @@ if (!user) {
 }
 ---
 
-<Layout>
+<AppLayout>
     <div class="container max-w-2xl py-10">
         <div class="space-y-6">
             <div>
@@ -22,4 +22,4 @@ if (!user) {
             <ProfileForm client:load />
         </div>
     </div>
-</Layout>
+</AppLayout>

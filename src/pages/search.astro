@@ -1,5 +1,5 @@
 ---
-import Layout from "../layouts/Layout.astro";
+import AppLayout from "@/layouts/AppLayout.astro";
 import MediaGrid from "@/components/media/MediaGrid.vue";
 import MediaCard from "@/components/media/MediaCard.vue";
 import { Search as SearchIcon, Loader2 } from "lucide-vue-next";
@@ -27,7 +27,7 @@ if (q) {
 }
 ---
 
-<Layout title={q ? `Search: ${q}` : "Search Media"}>
+<AppLayout>
     <main class="min-h-screen bg-gray-950 text-white pb-20">
         <!-- Search Header -->
         <div
@@ -98,4 +98,4 @@ if (q) {
             }
         </div>
     </main>
-</Layout>
+</AppLayout>
