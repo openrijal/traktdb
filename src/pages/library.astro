@@ -11,7 +11,9 @@ import {
     WatchStatusLabels,
     MediaType,
     LibraryTabs,
+    LibraryUI,
 } from "@/lib/constants";
+import { Button } from "@/components/ui/button";
 
 const session = await auth.api.getSession({ headers: Astro.request.headers });
 if (!session) {
@@ -39,6 +41,8 @@ const watchlist = rawItems
         vote_average: i.media.voteAverage || 0,
         release_date: i.media.releaseDate || undefined,
         first_air_date: i.media.releaseDate || undefined,
+        last_air_date: i.media.lastAirDate || undefined,
+        lastAirDate: i.media.lastAirDate || undefined,
     }));
 const completed = rawItems
     .filter((i) => i.progress.status === WatchStatus.COMPLETED)
@@ -50,6 +54,8 @@ const completed = rawItems
         vote_average: i.media.voteAverage || 0,
         release_date: i.media.releaseDate || undefined,
         first_air_date: i.media.releaseDate || undefined,
+        last_air_date: i.media.lastAirDate || undefined,
+        lastAirDate: i.media.lastAirDate || undefined,
     }));
 // ... other statuses
 
@@ -63,23 +69,32 @@ const displayItems = currentTab === LibraryTabs.WATCHED ? completed : watchlist;
             <h1 class="text-3xl font-bold mb-8">My Library</h1>
 
             <!-- Tabs -->
-            <div class="flex gap-4 border-b border-white/10 mb-8">
-                <a
+            <!-- Tabs -->
+            <div class="flex gap-4 mb-8">
+                <Button
+                    as="a"
                     href={`/library?tab=${LibraryTabs.WATCHLIST}`}
-                    class={`pb-4 px-2 font-medium transition-colors ${currentTab === LibraryTabs.WATCHLIST ? "text-indigo-400 border-b-2 border-indigo-400" : "text-gray-400 hover:text-white"}`}
+                    variant={currentTab === LibraryTabs.WATCHLIST
+                        ? "default"
+                        : "ghost"}
+                    class="rounded-full"
                 >
                     {WatchStatusLabels[WatchStatus.PLAN_TO_WATCH]} ({
                         watchlist.length
                     })
-                </a>
-                <a
+                </Button>
+                <Button
+                    as="a"
                     href={`/library?tab=${LibraryTabs.WATCHED}`}
-                    class={`pb-4 px-2 font-medium transition-colors ${currentTab === LibraryTabs.WATCHED ? "text-indigo-400 border-b-2 border-indigo-400" : "text-gray-400 hover:text-white"}`}
+                    variant={currentTab === LibraryTabs.WATCHED
+                        ? "default"
+                        : "ghost"}
+                    class="rounded-full"
                 >
                     {WatchStatusLabels[WatchStatus.COMPLETED]} ({
                         completed.length
                     })
-                </a>
+                </Button>
             </div>
 
             <!-- Grid -->
@@ -90,24 +105,24 @@ const displayItems = currentTab === LibraryTabs.WATCHED ? completed : watchlist;
                             <MediaCard
                                 client:visible
                                 media={item}
-                                type={item.type as "movie" | "tv"}
+                                type={item.type as MediaType}
                             />
                         ))}
                     </MediaGrid>
                 ) : (
                     <div class="text-center py-20 text-gray-500">
                         <p class="text-lg">
-                            No items found in No items found in{" "}
+                            {LibraryUI.NO_ITEMS_FOUND}{" "}
                             {currentTab === LibraryTabs.WATCHLIST
-                                ? "your watchlist"
-                                : "watched history"}
+                                ? LibraryUI.WATCHLIST_EMPTY
+                                : LibraryUI.WATCHED_EMPTY}
                             .
                         </p>
                         <a
                             href="/search"
                             class="text-indigo-400 hover:underline mt-2 inline-block"
                         >
-                            Find something to watch
+                            {LibraryUI.FIND_SOMETHING}
                         </a>
                     </div>
                 )

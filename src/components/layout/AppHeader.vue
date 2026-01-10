@@ -1,14 +1,9 @@
 <script setup lang="ts">
 import GlobalSearch from "@/components/search/GlobalSearch.vue";
 import { UserCircle } from 'lucide-vue-next';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
-const props = defineProps<{
-    user?: {
-        name?: string | null;
-        image?: string | null;
-        email?: string;
-    };
-}>();
+const props = defineProps<{ user?: { name?: string | null; image?: string | null; email?: string; }; }>();
 </script>
 
 <template>
@@ -19,12 +14,12 @@ const props = defineProps<{
         <div class="flex items-center gap-4">
             <div class="flex items-center gap-2">
                 <span class="text-sm font-medium hidden md:block">{{ props.user?.name || 'User' }}</span>
-                <div
-                    class="h-8 w-8 rounded-full bg-primary/20 overflow-hidden flex items-center justify-center border border-primary/10">
-                    <img v-if="props.user?.image" :src="props.user.image" alt="User"
-                        class="h-full w-full object-cover" />
-                    <UserCircle v-else class="h-5 w-5 text-primary" />
-                </div>
+                <Avatar class="h-8 w-8 border border-primary/10">
+                    <AvatarImage v-if="props.user?.image" :src="props.user.image" :alt="props.user.name || 'User'" />
+                    <AvatarFallback class="bg-primary/20">
+                        <UserCircle class="h-5 w-5 text-primary" />
+                    </AvatarFallback>
+                </Avatar>
             </div>
         </div>
     </header>

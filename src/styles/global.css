@@ -60,35 +60,35 @@
   Based on Shadcn Zinc Dark Theme
 */
 :root {
-  --background: 240 10% 3.9%;
-  --foreground: 0 0% 98%;
+  --background: 230 25% 6%;
+  --foreground: 210 40% 98%;
 
-  --card: 240 10% 3.9%;
-  --card-foreground: 0 0% 98%;
+  --card: 230 25% 10%;
+  --card-foreground: 210 40% 98%;
 
-  --popover: 240 10% 3.9%;
-  --popover-foreground: 0 0% 98%;
+  --popover: 230 25% 10%;
+  --popover-foreground: 210 40% 98%;
 
-  --primary: 0 0% 98%;
-  --primary-foreground: 240 5.9% 10%;
+  --primary: 221 83% 53%;
+  --primary-foreground: 210 40% 98%;
 
-  --secondary: 240 3.7% 15.9%;
-  --secondary-foreground: 0 0% 98%;
+  --secondary: 220 20% 18%;
+  --secondary-foreground: 210 40% 98%;
 
-  --muted: 240 3.7% 15.9%;
-  --muted-foreground: 240 5% 64.9%;
+  --muted: 220 20% 18%;
+  --muted-foreground: 215 20% 65%;
 
-  --accent: 240 3.7% 15.9%;
-  --accent-foreground: 0 0% 98%;
+  --accent: 220 20% 18%;
+  --accent-foreground: 210 40% 98%;
 
   --destructive: 0 62.8% 30.6%;
   --destructive-foreground: 0 0% 98%;
 
-  --border: 240 3.7% 15.9%;
-  --input: 240 3.7% 15.9%;
-  --ring: 240 4.9% 83.9%;
+  --border: 220 20% 18%;
+  --input: 220 20% 18%;
+  --ring: 221 83% 53%;
 
-  --radius: 0.5rem;
+  --radius: 0.75rem;
 }
 
 body {

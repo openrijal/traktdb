@@ -2,6 +2,7 @@
 import { ref, watch } from 'vue';
 import { Search as SearchIcon, Loader2, Film, Tv } from 'lucide-vue-next';
 import { cn } from '@/lib/utils';
+import { MediaType } from '@/lib/constants';
 
 const query = ref('');
 const results = ref<any[]>([]);
@@ -34,7 +35,7 @@ const handleInput = () => {
     }, 300);
 };
 
-const formatType = (type: string) => type === 'tv' ? 'TV Show' : 'Movie';
+const formatType = (type: string) => type === MediaType.TV ? 'TV Show' : 'Movie';
 
 const onBlur = () => {
     setTimeout(() => {
@@ -71,7 +72,7 @@ const onBlur = () => {
                         <span class="font-medium truncate">{{ item.title }}</span>
                         <div class="flex items-center gap-2 text-xs text-muted-foreground">
                             <span class="capitalize flex items-center gap-1">
-                                <Film v-if="item.media_type === 'movie'" class="h-3 w-3" />
+                                <Film v-if="item.media_type === MediaType.MOVIE" class="h-3 w-3" />
                                 <Tv v-else class="h-3 w-3" />
                                 {{ formatType(item.media_type) }}
                             </span>

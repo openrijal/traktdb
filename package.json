@@ -23,6 +23,7 @@
     "@ionic/pwa-elements": "^3.3.0",
     "@neondatabase/serverless": "^1.0.2",
     "@tailwindcss/vite": "^4.1.18",
+    "@vueuse/core": "^14.1.0",
     "astro": "^5.16.7",
     "better-auth": "^1.4.10",
     "class-variance-authority": "^0.7.1",

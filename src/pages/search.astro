@@ -3,6 +3,7 @@ import AppLayout from "@/layouts/AppLayout.astro";
 import MediaGrid from "@/components/media/MediaGrid.vue";
 import MediaCard from "@/components/media/MediaCard.vue";
 import { Search as SearchIcon, Loader2 } from "lucide-vue-next";
+import { Input } from "@/components/ui/input";
 
 // Server-side logic
 const q = Astro.url.searchParams.get("q");
@@ -42,12 +43,12 @@ if (q) {
                             class="h-5 w-5 text-gray-400 group-focus-within:text-indigo-400 transition-colors"
                         />
                     </div>
-                    <input
+                    <Input
                         type="text"
                         name="q"
                         value={q}
                         placeholder="Search movies & TV shows..."
-                        class="block w-full pl-11 pr-4 py-3 bg-gray-900 border border-transparent rounded-xl leading-5 text-gray-100 placeholder-gray-500 focus:outline-none focus:bg-gray-800 focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 sm:text-sm transition-all shadow-lg"
+                        class="block w-full pl-11 pr-4 py-3 bg-gray-900 border border-transparent rounded-xl leading-5 text-gray-100 placeholder-gray-500 focus:outline-none focus:bg-gray-800 focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 sm:text-sm transition-all shadow-lg h-12"
                         autofocus
                     />
                 </form>

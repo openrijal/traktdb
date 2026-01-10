@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { tmdb } from '@/lib/tmdb';
+import { MediaType } from '@/lib/constants';
 
 export const GET: APIRoute = async ({ request }) => {
     const url = new URL(request.url);
@@ -14,7 +15,7 @@ export const GET: APIRoute = async ({ request }) => {
         // Filter out people if we only want movies/tv
         // Map to simpler structure if needed, or return as is
         const results = data.results
-            .filter((i: any) => i.media_type === 'movie' || i.media_type === 'tv')
+            .filter((i: any) => i.media_type === MediaType.MOVIE || i.media_type === MediaType.TV)
             .slice(0, 10)
             .map((item: any) => ({
                 id: item.id,

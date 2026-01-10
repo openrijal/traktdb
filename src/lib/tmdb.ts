@@ -121,5 +121,9 @@ export const tmdb = {
 
   async getEpisode(tvId: number, seasonNumber: number, episodeNumber: number) {
     return this.fetch<TMDBEpisode>(`/tv/${tvId}/season/${seasonNumber}/episode/${episodeNumber}`);
+  },
+
+  async getTrending(mediaType: 'movie' | 'tv' | 'all' = 'all', timeWindow: 'day' | 'week' = 'week') {
+    return this.fetch<TMDBSearchResult>(`/trending/${mediaType}/${timeWindow}`);
   }
 };

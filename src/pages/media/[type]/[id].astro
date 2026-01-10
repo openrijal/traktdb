@@ -1,10 +1,12 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import MediaHeader from "@/components/media/MediaHeader.vue";
+import { Button } from "@/components/ui/button";
+import { MediaType } from "@/lib/constants";
 
 const { type, id } = Astro.params;
 
-if (!type || !id || (type !== "movie" && type !== "tv")) {
+if (!type || !id || (type !== MediaType.MOVIE && type !== MediaType.TV)) {
     return Astro.redirect("/404");
 }
 
@@ -37,12 +39,14 @@ try {
                         Error Loading Media
                     </h1>
                     <p class="text-gray-400">{error}</p>
-                    <a
+                    <Button
+                        as="a"
                         href="/search"
-                        class="mt-8 inline-block text-indigo-400 hover:text-indigo-300"
+                        variant="link"
+                        class="mt-8 text-indigo-400 hover:text-indigo-300"
                     >
                         Back to Search
-                    </a>
+                    </Button>
                 </div>
             ) : mediaItem ? (
                 <>

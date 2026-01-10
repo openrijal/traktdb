@@ -8,6 +8,7 @@ import {
     Search as SearchIcon
 } from 'lucide-vue-next';
 import { authClient } from '@/lib/auth-client';
+import { Button } from '@/components/ui/button';
 
 const props = defineProps<{
     currentPath: string;
@@ -56,11 +57,12 @@ function isActive(href: string) {
         </nav>
 
         <div class="p-4 border-t">
-            <button @click="handleSignOut"
-                class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors cursor-pointer">
+            <Button variant="ghost"
+                class="w-full justify-start gap-3 px-3 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                @click="handleSignOut">
                 <LogOut class="h-4 w-4" />
                 Sign Out
-            </button>
+            </Button>
         </div>
     </div>
 </template>
