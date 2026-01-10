@@ -78,9 +78,10 @@ const getHeaders = () => {
   };
 };
 
-export const tmdb = {
-  async fetch<T>(endpoint: string, params: Record<string, string> = {}): Promise<T> {
-    const apiKey = import.meta.env.TMDB_API_KEY;
+export const createTmdb = (env: any) => {
+  const apiKey = env?.TMDB_API_KEY || import.meta.env.TMDB_API_KEY || env?.TMDB_AUTH_KEY || import.meta.env.TMDB_AUTH_KEY;
+
+  const fetchTmdb = async <T>(endpoint: string, params: Record<string, string> = {}): Promise<T> => {
     if (!apiKey) {
       throw new Error('TMDB_API_KEY is not defined in environment variables');
     }
@@ -97,33 +98,38 @@ export const tmdb = {
     });
 
     if (!response.ok) {
+      // Log the error text for debugging
+      const errorText = await response.text();
+      console.error(`TMDB API Error: ${response.status} ${response.statusText}`, errorText);
       throw new Error(`TMDB API Error: ${response.status} ${response.statusText}`);
     }
 
     return response.json();
-  },
+  };
 
-  async searchMulti(query: string, page = 1) {
-    return this.fetch<TMDBSearchResult>('/search/multi', { query, page: page.toString() });
-  },
+  return {
+    async searchMulti(query: string, page = 1) {
+      return fetchTmdb<TMDBSearchResult>('/search/multi', { query, page: page.toString() });
+    },
 
-  async getMovie(id: number) {
-    return this.fetch<TMDBMovie>(`/movie/${id}`);
-  },
+    async getMovie(id: number) {
+      return fetchTmdb<TMDBMovie>(`/movie/${id}`);
+    },
 
-  async getTV(id: number) {
-    return this.fetch<TMDBTVShow>(`/tv/${id}`);
-  },
+    async getTV(id: number) {
+      return fetchTmdb<TMDBTVShow>(`/tv/${id}`);
+    },
 
-  async getSeason(tvId: number, seasonNumber: number) {
-    return this.fetch<TMDBSeason>(`/tv/${tvId}/season/${seasonNumber}`);
-  },
+    async getSeason(tvId: number, seasonNumber: number) {
+      return fetchTmdb<TMDBSeason>(`/tv/${tvId}/season/${seasonNumber}`);
+    },
 
-  async getEpisode(tvId: number, seasonNumber: number, episodeNumber: number) {
-    return this.fetch<TMDBEpisode>(`/tv/${tvId}/season/${seasonNumber}/episode/${episodeNumber}`);
-  },
+    async getEpisode(tvId: number, seasonNumber: number, episodeNumber: number) {
+      return fetchTmdb<TMDBEpisode>(`/tv/${tvId}/season/${seasonNumber}/episode/${episodeNumber}`);
+    },
 
-  async getTrending(mediaType: 'movie' | 'tv' | 'all' = 'all', timeWindow: 'day' | 'week' = 'week') {
-    return this.fetch<TMDBSearchResult>(`/trending/${mediaType}/${timeWindow}`);
-  }
+    async getTrending(mediaType: 'movie' | 'tv' | 'all' = 'all', timeWindow: 'day' | 'week' = 'week') {
+      return fetchTmdb<TMDBSearchResult>(`/trending/${mediaType}/${timeWindow}`);
+    }
+  };
 };

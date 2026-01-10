@@ -1,16 +1,17 @@
 {
-	"main": "dist/_worker.js/index.js",
-	"name": "cyan-comet",
+  "main": "dist/_worker.js/index.js",
+  "name": "traktdb",
+  "account_id": "6d2e606929eb69f91f43b147615f1111",
   "compatibility_date": "2026-01-09",
   "compatibility_flags": [
     "nodejs_compat",
     "global_fetch_strictly_public"
   ],
-	"assets": {
-		"binding": "ASSETS",
-		"directory": "./dist"
-	},
-	"observability": {
+  "assets": {
+    "binding": "ASSETS",
+    "directory": "./dist"
+  },
+  "observability": {
     "enabled": true
   }
 }

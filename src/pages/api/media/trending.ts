@@ -1,7 +1,10 @@
 import type { APIRoute } from "astro";
-import { tmdb } from "@/lib/tmdb";
+import { createTmdb } from "@/lib/tmdb";
 
-export const GET: APIRoute = async () => {
+export const GET: APIRoute = async ({ locals }) => {
+    // @ts-ignore
+    const env = locals.runtime?.env || import.meta.env;
+    const tmdb = createTmdb(env);
     try {
         const data = await tmdb.getTrending();
         return new Response(JSON.stringify(data), {

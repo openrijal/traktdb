@@ -2,10 +2,10 @@
 import AppLayout from "@/layouts/AppLayout.astro";
 import MediaGrid from "@/components/media/MediaGrid.vue";
 import MediaCard from "@/components/media/MediaCard.vue";
-import { db } from "@/lib/db";
+import { createDb } from "@/lib/db";
 import { mediaItems, userProgress } from "drizzle/schema";
 import { eq, desc, and } from "drizzle-orm";
-import { auth } from "@/lib/auth";
+import { createAuth } from "@/lib/auth";
 import {
     WatchStatus,
     WatchStatusLabels,
@@ -14,6 +14,10 @@ import {
     LibraryUI,
 } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
+
+const env = Astro.locals.runtime?.env || import.meta.env;
+const auth = createAuth(env);
+const db = createDb(env);
 
 const session = await auth.api.getSession({ headers: Astro.request.headers });
 if (!session) {

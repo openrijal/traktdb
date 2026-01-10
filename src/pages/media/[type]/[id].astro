@@ -1,5 +1,5 @@
 ---
-import Layout from "@/layouts/Layout.astro";
+import AppLayout from "@/layouts/AppLayout.astro";
 import MediaHeader from "@/components/media/MediaHeader.vue";
 import { Button } from "@/components/ui/button";
 import { MediaType } from "@/lib/constants";
@@ -30,7 +30,7 @@ try {
 }
 ---
 
-<Layout title={mediaItem ? mediaItem.title || mediaItem.name : "Loading..."}>
+<AppLayout>
     <main class="min-h-screen bg-gray-950 text-gray-100 pb-20">
         {
             error ? (
@@ -65,4 +65,4 @@ try {
             )
         }
     </main>
-</Layout>
+</AppLayout>

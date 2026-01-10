@@ -1,13 +1,18 @@
 import type { APIRoute } from 'astro';
-import { auth } from '@/lib/auth';
-import { db } from '@/lib/db';
+import { createAuth } from '@/lib/auth';
+import { createDb } from '@/lib/db';
 import { mediaItems, userProgress } from 'drizzle/schema';
 import { and, eq, sql } from 'drizzle-orm';
-import { tmdb } from '@/lib/tmdb';
+import { createTmdb } from '@/lib/tmdb';
 import { upsertMediaItem, upsertSeasons } from '@/lib/services/media';
 import { MediaType, WatchStatus } from '@/lib/constants';
 
-export const GET: APIRoute = async ({ request }) => {
+export const GET: APIRoute = async ({ request, locals }) => {
+    // @ts-ignore
+    const env = locals.runtime?.env || import.meta.env;
+    const auth = createAuth(env);
+    const db = createDb(env);
+
     const session = await auth.api.getSession({ headers: request.headers });
     if (!session) {
         return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
@@ -57,7 +62,13 @@ export const GET: APIRoute = async ({ request }) => {
     }
 };
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, locals }) => {
+    // @ts-ignore
+    const env = locals.runtime?.env || import.meta.env;
+    const auth = createAuth(env);
+    const db = createDb(env);
+    const tmdb = createTmdb(env);
+
     const session = await auth.api.getSession({ headers: request.headers });
     if (!session) {
         return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
@@ -90,16 +101,16 @@ export const POST: APIRoute = async ({ request }) => {
                 const show = await tmdb.getTV(tmdbId);
                 tmdbItem = show;
                 // Upsert seasons for TV shows to ensure we have data for Epic 5 later
-                const newId = await upsertMediaItem(tmdbItem, type);
+                const newId = await upsertMediaItem(db, tmdbItem, type);
                 if (newId && show.seasons) {
-                    await upsertSeasons(show.seasons, newId);
+                    await upsertSeasons(db, show.seasons, newId);
                 }
                 mediaItemId = newId;
             }
 
         }
         if (!mediaItemId && type === MediaType.MOVIE) {
-            mediaItemId = await upsertMediaItem(tmdbItem, type);
+            mediaItemId = await upsertMediaItem(db, tmdbItem, type);
         }
 
         if (!mediaItemId) {

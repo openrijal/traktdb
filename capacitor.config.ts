@@ -5,7 +5,9 @@ const config: CapacitorConfig = {
     appName: 'tracktdb',
     webDir: 'dist',
     server: {
-        androidScheme: 'https'
+        androidScheme: 'https',
+        url: 'https://traktdb.rijal-it.workers.dev',
+        cleartext: true
     }
 };
 

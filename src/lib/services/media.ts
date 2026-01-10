@@ -1,4 +1,4 @@
-import { db } from '@/lib/db';
+import type { Db } from '@/lib/db';
 import { mediaItems, seasons } from 'drizzle/schema';
 import { sql } from 'drizzle-orm';
 import type { TMDBMediaItem, TMDBSeason } from '@/lib/tmdb';
@@ -8,7 +8,7 @@ import { MediaType } from '@/lib/constants';
  * Upserts a single media item into the database.
  * Returns the internal ID of the media item.
  */
-export async function upsertMediaItem(item: TMDBMediaItem, type: MediaType): Promise<number | undefined> {
+export async function upsertMediaItem(db: Db, item: TMDBMediaItem, type: MediaType): Promise<number | undefined> {
     const values = {
         tmdbId: item.id,
         type: type,
@@ -48,7 +48,7 @@ export async function upsertMediaItem(item: TMDBMediaItem, type: MediaType): Pro
 /**
  * Upserts a list of seasons for a media item.
  */
-export async function upsertSeasons(seasonData: TMDBSeason[], mediaItemId: number) {
+export async function upsertSeasons(db: Db, seasonData: TMDBSeason[], mediaItemId: number) {
     if (seasonData.length === 0) return;
 
     const values = seasonData.map(s => ({
