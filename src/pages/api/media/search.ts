@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { tmdb, type TMDBMediaItem } from '@/lib/tmdb';
+import { createTmdb, type TMDBMediaItem } from '@/lib/tmdb';
 import { MediaType } from '@/lib/constants';
 import { createDb } from '@/lib/db';
 import { mediaItems } from 'drizzle/schema';
@@ -9,6 +9,8 @@ export const GET: APIRoute = async ({ request, locals }) => {
     // @ts-ignore
     const env = locals.runtime?.env || import.meta.env;
     const db = createDb(env);
+    const tmdb = createTmdb(env);
+
 
     const url = new URL(request.url);
     const q = url.searchParams.get('q');

@@ -1,5 +1,5 @@
 import { createAuthClient } from "better-auth/vue"
 
 export const authClient = createAuthClient({
-    baseURL: "http://localhost:4321" // TODO: Use env var
+    baseURL: import.meta.env.BETTER_AUTH_URL || undefined
 })

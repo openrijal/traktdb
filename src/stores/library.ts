@@ -50,7 +50,10 @@ export const useLibraryStore = defineStore('library', () => {
         try {
             const res = await fetch('/api/library/status', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
                 body: JSON.stringify({ tmdbId, type, status })
             });
 

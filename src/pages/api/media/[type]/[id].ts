@@ -1,14 +1,11 @@
 import type { APIRoute } from 'astro';
 import { createTmdb, type TMDBMediaItem, type TMDBSeason } from '@/lib/tmdb';
-import { createDb } from '@/lib/db';
-import { upsertMediaItem, upsertSeasons } from '@/lib/services/media';
 import { MediaType } from '@/lib/constants';
 
 
 export const GET: APIRoute = async ({ params, locals }) => {
     // @ts-ignore
     const env = locals.runtime?.env || import.meta.env;
-    const db = createDb(env);
     const tmdb = createTmdb(env);
 
     const { type, id } = params;
@@ -31,13 +28,9 @@ export const GET: APIRoute = async ({ params, locals }) => {
             seasonData = tvShow.seasons || [];
         }
 
-        // 1. Upsert Main Media Item
-        const mediaItemId = await upsertMediaItem(db, item, mediaType);
+        // 1. Fetched from TMDB, just pass through.
+        // DB Upserts are now handled when user adds to library (POST /api/library/status)
 
-        // 2. Upsert Seasons (if TV show)
-        if (mediaType === MediaType.TV && mediaItemId && seasonData.length > 0) {
-            await upsertSeasons(db, seasonData, mediaItemId);
-        }
 
         return new Response(JSON.stringify(item), {
             status: 200,

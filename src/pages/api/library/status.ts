@@ -74,6 +74,18 @@ export const POST: APIRoute = async ({ request, locals }) => {
         return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
     }
 
+    // CSRF Protection: Check for custom header
+    const requestedWith = request.headers.get('x-requested-with');
+    const origin = request.headers.get('origin');
+
+    // Simple check: Require X-Requested-With: XMLHttpRequest OR matching Origin
+    if (requestedWith !== 'XMLHttpRequest' && !origin?.includes('localhost') && !origin?.includes('traktdb')) {
+        // Note: In production, you'd stricter Origin/Host checks. For now, requiring the custom header is a strong signal.
+        if (requestedWith !== 'XMLHttpRequest') {
+            return new Response(JSON.stringify({ error: 'Missing Anti-CSRF Header' }), { status: 403 });
+        }
+    }
+
     try {
         const body = await request.json();
         const { tmdbId, type, status } = body;
