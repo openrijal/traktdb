@@ -7,6 +7,10 @@ const props = defineProps<{
     defaultValue?: string | number
     modelValue?: string | number
     class?: HTMLAttributes['class']
+    type?: string
+    placeholder?: string
+    name?: string
+    autofocus?: boolean
 }>()
 
 const emits = defineEmits<{

@@ -5,7 +5,10 @@ import {
     Library,
     Settings,
     LogOut,
-    Search as SearchIcon
+    Search as SearchIcon,
+    Book,
+    Headphones,
+    Users
 } from 'lucide-vue-next';
 import { authClient } from '@/lib/auth-client';
 import { Button } from '@/components/ui/button';
@@ -24,10 +27,10 @@ const handleSignOut = async () => {
     });
 };
 
-const links = [
+    const links = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Library', href: '/library', icon: Library },
-    { name: 'Search', href: '/search', icon: SearchIcon },
+    { name: 'Friends', href: '/friends', icon: Users },
     { name: 'Settings', href: '/settings', icon: Settings },
 ];
 

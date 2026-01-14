@@ -8,6 +8,9 @@ interface Props extends PrimitiveProps {
     variant?: ButtonVariants['variant']
     size?: ButtonVariants['size']
     class?: HTMLAttributes['class']
+    as?: string
+    href?: string
+    type?: 'button' | 'submit' | 'reset'
 }
 
 const props = withDefaults(defineProps<Props>(), {

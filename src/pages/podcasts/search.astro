@@ -1,0 +1,102 @@
+
+---
+import AppLayout from "@/layouts/AppLayout.astro";
+import PodcastGrid from "@/components/podcasts/PodcastGrid.vue";
+import PodcastCard from "@/components/podcasts/PodcastCard.vue";
+import { Search as SearchIcon } from "lucide-vue-next";
+import { Input } from "@/components/ui/input";
+
+// Server-side logic
+const q = Astro.url.searchParams.get("q");
+let results: any[] = [];
+let error = null;
+
+if (q) {
+    try {
+        const apiUrl = new URL("/api/podcasts/search", Astro.url.origin);
+        apiUrl.searchParams.set("q", q);
+
+        const res = await fetch(apiUrl);
+        if (res.ok) {
+            const data = await res.json();
+            results = data.results || [];
+        } else {
+            error = "Failed to fetch results";
+        }
+    } catch (e) {
+        error = "An error occurred";
+    }
+}
+---
+
+<AppLayout>
+    <main class="min-h-screen bg-gray-950 text-white pb-20">
+        <!-- Search Header -->
+        <div
+            class="sticky top-0 z-40 bg-gray-950/80 backdrop-blur-md border-b border-white/10"
+        >
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                <form action="/podcasts/search" method="GET" class="relative group">
+                    <div
+                        class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"
+                    >
+                        <SearchIcon
+                            class="h-5 w-5 text-gray-400 group-focus-within:text-indigo-400 transition-colors"
+                        />
+                    </div>
+                    <Input
+                        type="text"
+                        name="q"
+                        value={q}
+                        placeholder="Search podcasts..."
+                        class="block w-full pl-11 pr-4 py-3 bg-gray-900 border border-transparent rounded-xl leading-5 text-gray-100 placeholder-gray-500 focus:outline-none focus:bg-gray-800 focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 sm:text-sm transition-all shadow-lg h-12"
+                        autofocus
+                    />
+                </form>
+            </div>
+        </div>
+
+        <!-- Results -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            {
+                q && (
+                    <h2 class="text-xl font-semibold text-gray-400 mb-6">
+                        {results.length > 0
+                            ? `Found ${results.length} results for "${q}"`
+                            : `No results found for "${q}"`}
+                    </h2>
+                )
+            }
+
+            {
+                error && (
+                    <div class="p-4 bg-red-900/20 border border-red-500/50 rounded-lg text-red-200">
+                        {error}
+                    </div>
+                )
+            }
+
+            <PodcastGrid>
+                {
+                    results.map((item) => (
+                        <PodcastCard
+                            client:visible
+                            podcast={item}
+                        />
+                    ))
+                }
+            </PodcastGrid>
+
+            {
+                !q && (
+                    <div class="flex flex-col items-center justify-center py-20 text-gray-500">
+                        <SearchIcon class="w-16 h-16 mb-4 opacity-20" />
+                        <p class="text-lg">
+                            Search for podcasts to add to your library.
+                        </p>
+                    </div>
+                )
+            }
+        </div>
+    </main>
+</AppLayout>

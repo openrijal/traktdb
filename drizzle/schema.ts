@@ -120,3 +120,67 @@ export const userProgress = pgTable('user_progress', {
 }, (t) => ({
     unq: uniqueIndex('user_progress_user_media_unique').on(t.userId, t.mediaItemId),
 }));
+
+export const books = pgTable('books', {
+    id: serial('id').primaryKey(),
+    googleId: text('google_id').notNull().unique(),
+    title: text('title').notNull(),
+    authors: text('authors').array(),
+    description: text('description'),
+    thumbnail: text('thumbnail'),
+    publishedDate: text('published_date'),
+    pageCount: integer('page_count'),
+    categories: text('categories').array(),
+    averageRating: integer('average_rating'), 
+    ratingsCount: integer('ratings_count'),
+    isEbook: boolean('is_ebook').default(false),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export const podcasts = pgTable('podcasts', {
+    id: serial('id').primaryKey(),
+    itunesId: text('itunes_id').notNull().unique(),
+    collectionName: text('collection_name').notNull(),
+    artistName: text('artist_name'),
+    artworkUrl: text('artwork_url'),
+    feedUrl: text('feed_url'),
+    genres: text('genres').array(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export const userPodcastProgress = pgTable('user_podcast_progress', {
+    id: serial('id').primaryKey(),
+    userId: text('user_id').notNull().references(() => users.id),
+    podcastId: integer('podcast_id').notNull().references(() => podcasts.id),
+    status: text('status').notNull(), // 'listening', 'listened', 'plan_to_listen', 'dropped'
+    progress: integer('progress').default(0), // episode count or specific episode ID? For now simple.
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}, (t) => ({
+    unq: uniqueIndex('user_podcast_progress_user_podcast_unique').on(t.userId, t.podcastId),
+}));
+
+export const userBookProgress = pgTable('user_book_progress', {
+    id: serial('id').primaryKey(),
+    userId: text('user_id').notNull().references(() => users.id),
+    bookId: integer('book_id').notNull().references(() => books.id),
+    status: text('status').notNull(), // 'reading', 'completed', 'plan_to_read', 'dropped'
+    progress: integer('progress').default(0), // page number
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}, (t) => ({
+    unq: uniqueIndex('user_book_progress_user_book_unique').on(t.userId, t.bookId),
+}));
+
+export const friendships = pgTable('friendships', {
+    id: serial('id').primaryKey(),
+    userId: text('user_id').notNull().references(() => users.id),
+    friendId: text('friend_id').notNull().references(() => users.id),
+    status: text('status').notNull(), // 'pending', 'accepted'
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}, (t) => ({
+    unq: uniqueIndex('friendships_user_friend_unique').on(t.userId, t.friendId),
+}));

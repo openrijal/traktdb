@@ -35,7 +35,7 @@ const currentPath = Astro.url.pathname;
             </div>
 
             <div class="flex flex-col flex-1 h-full overflow-hidden">
-                <AppHeader user={user} client:load />
+                <AppHeader user={user || undefined} client:load />
                 <main class="flex-1 overflow-y-auto p-6 scroll-smooth">
                     <slot />
                 </main>

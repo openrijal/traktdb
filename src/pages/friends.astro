@@ -1,15 +1,13 @@
 
 ---
 import AppLayout from "@/layouts/AppLayout.astro";
-import SearchPage from "@/components/search/SearchPage.vue";
+import FriendsDashboard from "@/components/friends/FriendsDashboard.vue";
 import { createAuth } from "@/lib/auth";
 
 const env = Astro.locals.runtime?.env || import.meta.env;
 const auth = createAuth(env);
 const session = await auth.api.getSession({ headers: Astro.request.headers });
 
-// Optional: Redirect if not logged in, or allow public search? 
-// The app seems to require login for most parts.
 if (!session) {
     return Astro.redirect("/login");
 }
@@ -17,8 +15,10 @@ if (!session) {
 
 <AppLayout>
     <main class="min-h-screen bg-gray-950 text-white pb-20">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <SearchPage client:load />
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <h1 class="text-3xl font-bold mb-8">Friends</h1>
+            
+            <FriendsDashboard client:load />
         </div>
     </main>
 </AppLayout>
