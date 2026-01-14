@@ -1,19 +1,38 @@
+
 ---
 import AppLayout from "@/layouts/AppLayout.astro";
 import MediaGrid from "@/components/media/MediaGrid.vue";
 import MediaCard from "@/components/media/MediaCard.vue";
+import BookGrid from "@/components/books/BookGrid.vue";
+import BookCard from "@/components/books/BookCard.vue";
+import PodcastGrid from "@/components/podcasts/PodcastGrid.vue";
+import PodcastCard from "@/components/podcasts/PodcastCard.vue";
+import InlineMediaSearch from "@/components/search/InlineMediaSearch.vue";
+import InlineBookSearch from "@/components/search/InlineBookSearch.vue";
+import InlinePodcastSearch from "@/components/search/InlinePodcastSearch.vue";
 import { createDb } from "@/lib/db";
-import { mediaItems, userProgress } from "drizzle/schema";
+import {
+    mediaItems,
+    userProgress,
+    books,
+    userBookProgress,
+    podcasts,
+    userPodcastProgress,
+} from "drizzle/schema";
 import { eq, desc, and } from "drizzle-orm";
 import { createAuth } from "@/lib/auth";
 import {
+    MediaType,
     WatchStatus,
     WatchStatusLabels,
-    MediaType,
-    LibraryTabs,
+    ReadStatus,
+    ReadStatusLabels,
+    ListenStatus,
+    ListenStatusLabels,
     LibraryUI,
 } from "@/lib/constants";
-import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { Clapperboard, Tv, Book, Tablet, Headphones } from "lucide-vue-next";
 
 const env = Astro.locals.runtime?.env || import.meta.env;
 const auth = createAuth(env);
@@ -24,20 +43,156 @@ if (!session) {
     return Astro.redirect("/login");
 }
 
-// Fetch user library directly from DB
-const rawItems = await db
-    .select({
-        progress: userProgress,
-        media: mediaItems,
-    })
-    .from(userProgress)
-    .innerJoin(mediaItems, eq(userProgress.mediaItemId, mediaItems.id))
-    .where(eq(userProgress.userId, session.user.id))
-    .orderBy(desc(userProgress.updatedAt));
+// 1. Determine Current Type and Status
+const typeParam = Astro.url.searchParams.get("type");
+const currentType = (
+    Object.values(MediaType).includes(typeParam as MediaType)
+        ? typeParam
+        : MediaType.MOVIE
+) as MediaType;
 
-const watchlist = rawItems
-    .filter((i) => i.progress.status === WatchStatus.PLAN_TO_WATCH)
-    .map((i) => ({
+// Default statuses based on type
+const getDefaultStatus = (type: MediaType) => {
+    switch (type) {
+        case MediaType.MOVIE:
+        case MediaType.TV:
+            return WatchStatus.PLAN_TO_WATCH;
+        case MediaType.BOOK:
+        case MediaType.EBOOK:
+            return ReadStatus.READING;
+        case MediaType.PODCAST:
+            return ListenStatus.LISTENING;
+        default:
+            return WatchStatus.PLAN_TO_WATCH;
+    }
+};
+
+const statusParam = Astro.url.searchParams.get("status");
+const currentStatus = statusParam || getDefaultStatus(currentType);
+
+// 2. Define Tabs Configuration
+const mediaTabs = [
+    {
+        id: MediaType.MOVIE,
+        label: "Movies",
+        icon: Clapperboard,
+        href: `/library?type=${MediaType.MOVIE}`,
+    },
+    {
+        id: MediaType.TV,
+        label: "Series",
+        icon: Tv,
+        href: `/library?type=${MediaType.TV}`,
+    },
+    {
+        id: MediaType.BOOK,
+        label: "Books",
+        icon: Book,
+        href: `/library?type=${MediaType.BOOK}`,
+    },
+    {
+        id: MediaType.EBOOK,
+        label: "E-Books",
+        icon: Tablet,
+        href: `/library?type=${MediaType.EBOOK}`,
+    },
+    {
+        id: MediaType.PODCAST,
+        label: "Podcasts",
+        icon: Headphones,
+        href: `/library?type=${MediaType.PODCAST}`,
+    },
+];
+
+const getStatusTabs = (type: MediaType) => {
+    switch (type) {
+        case MediaType.MOVIE:
+        case MediaType.TV:
+            return [
+                {
+                    id: WatchStatus.PLAN_TO_WATCH,
+                    label: WatchStatusLabels[WatchStatus.PLAN_TO_WATCH],
+                },
+                {
+                    id: WatchStatus.WATCHING,
+                    label: WatchStatusLabels[WatchStatus.WATCHING],
+                },
+                {
+                    id: WatchStatus.COMPLETED,
+                    label: WatchStatusLabels[WatchStatus.COMPLETED],
+                },
+                {
+                    id: WatchStatus.DROPPED,
+                    label: WatchStatusLabels[WatchStatus.DROPPED],
+                },
+            ];
+        case MediaType.BOOK:
+        case MediaType.EBOOK:
+            return [
+                {
+                    id: ReadStatus.READING,
+                    label: ReadStatusLabels[ReadStatus.READING],
+                },
+                {
+                    id: ReadStatus.PLAN_TO_READ,
+                    label: ReadStatusLabels[ReadStatus.PLAN_TO_READ],
+                },
+                {
+                    id: ReadStatus.COMPLETED,
+                    label: ReadStatusLabels[ReadStatus.COMPLETED],
+                },
+                {
+                    id: ReadStatus.DROPPED,
+                    label: ReadStatusLabels[ReadStatus.DROPPED],
+                },
+            ];
+        case MediaType.PODCAST:
+            return [
+                {
+                    id: ListenStatus.LISTENING,
+                    label: ListenStatusLabels[ListenStatus.LISTENING],
+                },
+                {
+                    id: ListenStatus.PLAN_TO_LISTEN,
+                    label: ListenStatusLabels[ListenStatus.PLAN_TO_LISTEN],
+                },
+                {
+                    id: ListenStatus.COMPLETED,
+                    label: ListenStatusLabels[ListenStatus.COMPLETED],
+                },
+                {
+                    id: ListenStatus.DROPPED,
+                    label: ListenStatusLabels[ListenStatus.DROPPED],
+                },
+            ];
+        default:
+            return [];
+    }
+};
+
+const statusTabs = getStatusTabs(currentType);
+
+// 3. Fetch Data
+let items: any[] = [];
+
+if (currentType === MediaType.MOVIE || currentType === MediaType.TV) {
+    const raw = await db
+        .select({
+            progress: userProgress,
+            media: mediaItems,
+        })
+        .from(userProgress)
+        .innerJoin(mediaItems, eq(userProgress.mediaItemId, mediaItems.id))
+        .where(
+            and(
+                eq(userProgress.userId, session.user.id),
+                eq(mediaItems.type, currentType),
+                eq(userProgress.status, currentStatus)
+            )
+        )
+        .orderBy(desc(userProgress.updatedAt));
+
+    items = raw.map((i) => ({
         ...i.media,
         id: i.media.tmdbId,
         media_type: i.media.type,
@@ -48,86 +203,205 @@ const watchlist = rawItems
         last_air_date: i.media.lastAirDate || undefined,
         lastAirDate: i.media.lastAirDate || undefined,
     }));
-const completed = rawItems
-    .filter((i) => i.progress.status === WatchStatus.COMPLETED)
-    .map((i) => ({
-        ...i.media,
-        id: i.media.tmdbId,
-        media_type: i.media.type,
-        poster_path: i.media.posterPath,
-        vote_average: i.media.voteAverage || 0,
-        release_date: i.media.releaseDate || undefined,
-        first_air_date: i.media.releaseDate || undefined,
-        last_air_date: i.media.lastAirDate || undefined,
-        lastAirDate: i.media.lastAirDate || undefined,
-    }));
-// ... other statuses
+} else if (currentType === MediaType.BOOK || currentType === MediaType.EBOOK) {
+    const isEbook = currentType === MediaType.EBOOK;
+    const raw = await db
+        .select({
+            progress: userBookProgress,
+            book: books,
+        })
+        .from(userBookProgress)
+        .innerJoin(books, eq(userBookProgress.bookId, books.id))
+        .where(
+            and(
+                eq(userBookProgress.userId, session.user.id),
+                eq(books.isEbook, isEbook),
+                eq(userBookProgress.status, currentStatus)
+            )
+        )
+        .orderBy(desc(userBookProgress.updatedAt));
 
-const currentTab = Astro.url.searchParams.get("tab") || LibraryTabs.WATCHLIST;
-const displayItems = currentTab === LibraryTabs.WATCHED ? completed : watchlist;
+    items = raw.map((i) => ({
+        id: i.book.googleId,
+        volumeInfo: {
+            title: i.book.title,
+            authors: i.book.authors || [],
+            imageLinks: {
+                thumbnail: i.book.thumbnail || undefined,
+            },
+            publishedDate: i.book.publishedDate || undefined,
+            averageRating: i.book.averageRating
+                ? i.book.averageRating / 10
+                : undefined,
+        },
+    }));
+} else if (currentType === MediaType.PODCAST) {
+    const raw = await db
+        .select({
+            progress: userPodcastProgress,
+            podcast: podcasts,
+        })
+        .from(userPodcastProgress)
+        .innerJoin(podcasts, eq(userPodcastProgress.podcastId, podcasts.id))
+        .where(
+            and(
+                eq(userPodcastProgress.userId, session.user.id),
+                eq(userPodcastProgress.status, currentStatus)
+            )
+        )
+        .orderBy(desc(userPodcastProgress.updatedAt));
+
+    items = raw.map((i) => ({
+        collectionId: parseInt(i.podcast.itunesId),
+        collectionName: i.podcast.collectionName,
+        artistName: i.podcast.artistName,
+        artworkUrl600: i.podcast.artworkUrl || undefined,
+    }));
+}
 ---
 
 <AppLayout>
     <main class="min-h-screen bg-gray-950 text-white pb-20">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <h1 class="text-3xl font-bold mb-8">My Library</h1>
-
-            <!-- Tabs -->
-            <!-- Tabs -->
-            <div class="flex gap-4 mb-8">
-                <Button
-                    as="a"
-                    href={`/library?tab=${LibraryTabs.WATCHLIST}`}
-                    variant={currentTab === LibraryTabs.WATCHLIST
-                        ? "default"
-                        : "ghost"}
-                    class="rounded-full"
-                >
-                    {WatchStatusLabels[WatchStatus.PLAN_TO_WATCH]} ({
-                        watchlist.length
-                    })
-                </Button>
-                <Button
-                    as="a"
-                    href={`/library?tab=${LibraryTabs.WATCHED}`}
-                    variant={currentTab === LibraryTabs.WATCHED
-                        ? "default"
-                        : "ghost"}
-                    class="rounded-full"
-                >
-                    {WatchStatusLabels[WatchStatus.COMPLETED]} ({
-                        completed.length
-                    })
-                </Button>
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+                <h1 class="text-3xl font-bold">My Library</h1>
+                {/* Inline Search based on media type */}
+                {(currentType === MediaType.MOVIE || currentType === MediaType.TV) && (
+                    <InlineMediaSearch 
+                        client:load 
+                        mediaType={currentType === MediaType.TV ? 'tv' : 'movie'}
+                        placeholder={`Search to add ${currentType === MediaType.TV ? 'series' : 'movies'}...`}
+                    />
+                )}
+                {(currentType === MediaType.BOOK || currentType === MediaType.EBOOK) && (
+                    <InlineBookSearch 
+                        client:load 
+                        isEbook={currentType === MediaType.EBOOK}
+                        placeholder={`Search to add ${currentType === MediaType.EBOOK ? 'e-books' : 'books'}...`}
+                    />
+                )}
+                {currentType === MediaType.PODCAST && (
+                    <InlinePodcastSearch 
+                        client:load 
+                        placeholder="Search to add podcasts..."
+                    />
+                )}
             </div>
 
-            <!-- Grid -->
-            {
-                displayItems.length > 0 ? (
-                    <MediaGrid>
-                        {displayItems.map((item) => (
-                            <MediaCard
-                                client:visible
-                                media={item}
-                                type={item.type as MediaType}
-                            />
-                        ))}
-                    </MediaGrid>
-                ) : (
-                    <div class="text-center py-20 text-gray-500">
-                        <p class="text-lg">
-                            {LibraryUI.NO_ITEMS_FOUND}{" "}
-                            {currentTab === LibraryTabs.WATCHLIST
-                                ? LibraryUI.WATCHLIST_EMPTY
-                                : LibraryUI.WATCHED_EMPTY}
-                            .
-                        </p>
+            <!-- Media Type Tabs -->
+            <div
+                class="flex flex-wrap gap-2 mb-8 bg-gray-900/50 p-1 rounded-xl w-fit"
+            >
+                {
+                    mediaTabs.map((tab) => (
                         <a
-                            href="/search"
-                            class="text-indigo-400 hover:underline mt-2 inline-block"
+                            href={tab.href}
+                            class={cn(
+                                "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all",
+                                currentType === tab.id
+                                    ? "bg-indigo-600 text-white shadow-lg"
+                                    : "text-gray-400 hover:text-white hover:bg-white/5",
+                            )}
                         >
-                            {LibraryUI.FIND_SOMETHING}
+                            <tab.icon class="w-4 h-4" />
+                            {tab.label}
                         </a>
+                    ))
+                }
+            </div>
+
+            <!-- Status Tabs -->
+            <div class="flex flex-wrap gap-3 mb-8">
+                {
+                    statusTabs.map((tab) => (
+                        <a
+                            href={`/library?type=${currentType}&status=${tab.id}`}
+                            class={cn(
+                                "inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-all border",
+                                currentStatus === tab.id
+                                    ? "bg-indigo-600 text-white border-indigo-600 shadow-lg"
+                                    : "bg-transparent text-gray-400 border-white/10 hover:border-white/20 hover:text-white hover:bg-white/5",
+                            )}
+                        >
+                            {tab.label}
+                        </a>
+                    ))
+                }
+            </div>
+
+            <!-- Content Grid -->
+            {
+                items.length > 0 ? (
+                    <>
+                        {/* Movies & TV */}
+                        {(currentType === MediaType.MOVIE ||
+                            currentType === MediaType.TV) && (
+                            <MediaGrid>
+                                {items.map((item) => (
+                                    <MediaCard
+                                        client:visible
+                                        media={item}
+                                        type={currentType}
+                                    />
+                                ))}
+                            </MediaGrid>
+                        )}
+
+                        {/* Books & eBooks */}
+                        {(currentType === MediaType.BOOK ||
+                            currentType === MediaType.EBOOK) && (
+                            <BookGrid>
+                                {items.map((item) => (
+                                    <BookCard client:visible book={item} />
+                                ))}
+                            </BookGrid>
+                        )}
+
+                        {/* Podcasts */}
+                        {currentType === MediaType.PODCAST && (
+                            <PodcastGrid>
+                                {items.map((item) => (
+                                    <PodcastCard
+                                        client:visible
+                                        podcast={item}
+                                    />
+                                ))}
+                            </PodcastGrid>
+                        )}
+                    </>
+                ) : (
+                    <div class="flex flex-col items-center justify-center py-20 text-gray-500 border border-dashed border-white/10 rounded-2xl bg-white/5">
+                        <p class="text-lg mb-6">
+                            {LibraryUI.NO_ITEMS_FOUND} your{" "}
+                            <span class="text-indigo-400 font-medium">
+                                {
+                                    statusTabs.find((t) => t.id === currentStatus)
+                                        ?.label
+                                }
+                            </span>{" "}
+                            list.
+                        </p>
+                        <p class="text-gray-400 mb-4">Search to add something:</p>
+                        {(currentType === MediaType.MOVIE || currentType === MediaType.TV) && (
+                            <InlineMediaSearch 
+                                client:load 
+                                mediaType={currentType === MediaType.TV ? 'tv' : 'movie'}
+                                placeholder={`Search ${currentType === MediaType.TV ? 'series' : 'movies'}...`}
+                            />
+                        )}
+                        {(currentType === MediaType.BOOK || currentType === MediaType.EBOOK) && (
+                            <InlineBookSearch 
+                                client:load 
+                                isEbook={currentType === MediaType.EBOOK}
+                                placeholder={`Search ${currentType === MediaType.EBOOK ? 'e-books' : 'books'}...`}
+                            />
+                        )}
+                        {currentType === MediaType.PODCAST && (
+                            <InlinePodcastSearch 
+                                client:load 
+                                placeholder="Search podcasts..."
+                            />
+                        )}
                     </div>
                 )
             }
