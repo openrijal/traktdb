@@ -59,8 +59,8 @@ const performSearch = async () => {
 };
 
 const selectItem = (item: any) => {
-    // Navigate to the podcast detail page
-    window.location.href = `/podcasts/${item.collectionId}`;
+    const podcastId = item.id || item.collectionId;
+    window.location.href = `/podcasts/${podcastId}`;
     query.value = '';
     results.value = [];
     isOpen.value = false;
@@ -115,8 +115,10 @@ onUnmounted(() => {
 });
 
 const getArtwork = (podcast: any) => {
-    return podcast.artworkUrl100 || podcast.artworkUrl60 || null;
+    return podcast.artworkUrl600 || podcast.artworkUrl100 || podcast.artworkUrl60 || null;
 };
+
+const getPodcastId = (podcast: any) => podcast.id || podcast.listenNotesId || podcast.collectionId;
 </script>
 
 <template>
@@ -155,7 +157,7 @@ const getArtwork = (podcast: any) => {
             
             <button
                 v-for="(item, index) in results"
-                :key="item.collectionId"
+                :key="getPodcastId(item)"
                 @click="selectItem(item)"
                 :class="cn(
                     'w-full flex items-center gap-3 p-3 text-left hover:bg-gray-800/50 transition-colors',

@@ -140,11 +140,15 @@ export const books = pgTable('books', {
 
 export const podcasts = pgTable('podcasts', {
     id: serial('id').primaryKey(),
-    itunesId: text('itunes_id').notNull().unique(),
+    listenNotesId: text('listen_notes_id').unique(),
+    itunesId: text('itunes_id').unique(),
     collectionName: text('collection_name').notNull(),
     artistName: text('artist_name'),
     artworkUrl: text('artwork_url'),
     feedUrl: text('feed_url'),
+    description: text('description'),
+    totalEpisodes: integer('total_episodes'),
+    listenScore: integer('listen_score'),
     genres: text('genres').array(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
