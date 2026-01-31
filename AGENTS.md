@@ -1,42 +1,81 @@
 # AGENTS.md
 
 ## Project Overview
-Media tracking app built with Astro, Vue, DrizzleORM, and Capacitor. Uses BetterAuth for authentication, PostgreSQL via Supabase, and TMDB API for movie/TV data.
+TraktDB is a media tracking app built with Astro, Vue, DrizzleORM, and Capacitor. Uses BetterAuth for authentication with Google OAuth, Neon PostgreSQL for the database, and integrates with TMDB, Google Books, and iTunes APIs.
 
-## Dev Environment Setup
-- Run `npm install` to install dependencies.
-- Copy `.env.example` to `.env` and configure database connection and API keys.
-- Run `npm run db:migrate` to apply database migrations.
-- Run `npm run dev` to start the development server.
+## Quick Start
+```bash
+pnpm install
+cp .env.example .env  # Configure your API keys
+pnpm db:migrate
+pnpm dev
+```
 
 ## Key Directories
-- `src/components/` - Vue components (ShadCN wrapped via shadcn-vue)
+- `src/components/` - Vue components (ShadCN-Vue based)
 - `src/pages/` - Astro pages and API routes
-- `src/lib/db/` - Database connection and query helpers
+- `src/lib/` - Services and utilities (auth, db, TMDB, etc.)
 - `src/stores/` - Pinia stores for state management
-- `drizzle/` - DrizzleORM schema and migrations
+- `drizzle/` - Database schema and migrations
+- `specs/` - Feature specifications and PRD
 
-## Database Commands
-- `npm run db:generate` - Generate migration files from schema changes.
-- `npm run db:migrate` - Run pending migrations.
-- `npm run db:studio` - Open Drizzle Studio for database inspection.
+## Specifications
+Feature specs are in `specs/001-media-tracking-core/`:
+- `spec.md` - Product Requirements Document
+- `plan.md` - Technical implementation plan  
+- `tasks.md` - Task breakdown with status
+- `data-model.md` - Entity definitions
+- `research.md` - Technology decisions
+
+Constitution (project principles): `.specify/memory/constitution.md`
+
+## Database
+- **ORM**: DrizzleORM
+- **Provider**: Neon PostgreSQL (serverless)
+- **Commands**:
+  - `pnpm db:generate` - Generate migrations from schema changes
+  - `pnpm db:migrate` - Run pending migrations
+  - `pnpm db:studio` - Open Drizzle Studio
+
+## Authentication
+- **Library**: BetterAuth
+- **Method**: Google OAuth only (no password auth)
+- **Protected Routes**: Use middleware in `src/middleware.ts`
+
+## API Integrations
+- **TMDB**: Movies and TV shows (`src/lib/tmdb.ts`)
+- **Google Books**: Book metadata (`src/lib/google-books.ts`)
+- **iTunes**: Podcast search (`src/lib/itunes.ts`)
 
 ## Mobile (Capacitor)
-- `npm run build` then `npx cap sync` to sync web build to native projects.
-- iOS: Open `ios/` in Xcode.
-- Android: Open `android/` in Android Studio.
+```bash
+pnpm build
+npx cap sync
+# iOS: open ios/App/App.xcworkspace in Xcode
+# Android: open android/ in Android Studio
+```
 
-## Testing & Linting
-- Run `npm run lint` before committing.
-- Run `npm test` to execute the test suite.
-- Fix any TypeScript or lint errors before merging.
+## Testing
+```bash
+pnpm test        # Run all tests
+pnpm test:ui     # Open Vitest UI
+```
 
-## API Routes
-- All authenticated routes validate session via BetterAuth middleware.
-- API routes live in `src/pages/api/`.
-- Use DrizzleORM queries from `src/lib/db/queries/` for database operations.
+## Deployment
+- **Web**: Cloudflare Pages via `pnpm deploy`
+- **Mobile**: App Store / Play Store (manual)
 
-## PR Instructions
-- Title format: `[feature-area] <Title>` (e.g., `[auth] Add Google OAuth`).
-- Always run lint and tests before committing.
-- Include migration files if schema changes are made.
+## GitHub Issues
+Track work via GitHub Issues. Key epics:
+- #5 Rating & Progress System
+- #6 Calendar & Scheduling
+- #7 Watch Providers
+- #8 Books & Podcasts
+- #9 Mobile App Development
+- #10 Production Readiness
+
+## PR Guidelines
+- Title format: `[feature-area] <Title>`
+- Run `pnpm test` before committing
+- Include migration files if schema changes
+- Link to relevant GitHub issue
