@@ -115,10 +115,10 @@ onUnmounted(() => {
 });
 
 const getArtwork = (podcast: any) => {
-    return podcast.artworkUrl600 || podcast.artworkUrl100 || podcast.artworkUrl60 || null;
+    return podcast.image || podcast.thumbnail || podcast.artworkUrl600 || podcast.artworkUrl100 || null;
 };
 
-const getPodcastId = (podcast: any) => podcast.id || podcast.listenNotesId || podcast.collectionId;
+const getPodcastId = (podcast: any) => podcast.id || podcast.listenNotesId;
 </script>
 
 <template>
@@ -168,7 +168,7 @@ const getPodcastId = (podcast: any) => podcast.id || podcast.listenNotesId || po
                     <img 
                         v-if="getArtwork(item)"
                         :src="getArtwork(item)!"
-                        :alt="item.collectionName"
+                        :alt="item.title || item.collectionName"
                         class="w-full h-full object-cover"
                     />
                     <div v-else class="w-full h-full flex items-center justify-center">
@@ -176,8 +176,8 @@ const getPodcastId = (podcast: any) => podcast.id || podcast.listenNotesId || po
                     </div>
                 </div>
                 <div class="flex-1 min-w-0">
-                    <p class="font-medium text-white truncate">{{ item.collectionName }}</p>
-                    <p class="text-sm text-gray-400 truncate">{{ item.artistName }}</p>
+                    <p class="font-medium text-white truncate">{{ item.title || item.collectionName }}</p>
+                    <p class="text-sm text-gray-400 truncate">{{ item.publisher || item.artistName }}</p>
                 </div>
                 <Plus class="w-4 h-4 text-indigo-400 flex-shrink-0" />
             </button>

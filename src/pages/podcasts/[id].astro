@@ -1,0 +1,67 @@
+---
+import AppLayout from "@/layouts/AppLayout.astro";
+import PodcastHeader from "@/components/podcasts/PodcastHeader.vue";
+
+const { id } = Astro.params;
+
+if (!id) {
+    return Astro.redirect("/404");
+}
+
+let podcast = null;
+let error = null;
+
+try {
+    const apiUrl = new URL(`/api/podcasts/${id}`, Astro.url.origin);
+    const res = await fetch(apiUrl);
+
+    if (res.ok) {
+        podcast = await res.json();
+    } else if (res.status === 404) {
+        return Astro.redirect("/404");
+    } else {
+        error = "Failed to load podcast";
+    }
+} catch (e) {
+    error = "An error occurred";
+    console.error(e);
+}
+---
+
+<AppLayout>
+    <main class="min-h-screen bg-gray-950 text-gray-100 pb-20">
+        {
+            error ? (
+                <div class="max-w-7xl mx-auto px-4 py-20 text-center">
+                    <h1 class="text-2xl font-bold text-red-500 mb-4">
+                        Error Loading Podcast
+                    </h1>
+                    <p class="text-gray-400">{error}</p>
+                    <a
+                        href="/library?type=podcast"
+                        class="mt-8 inline-block text-indigo-400 hover:text-indigo-300"
+                    >
+                        Back to Library
+                    </a>
+                </div>
+            ) : podcast ? (
+                <>
+                    <PodcastHeader client:load podcast={podcast} />
+
+                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                        {podcast.description && (
+                            <div class="prose prose-invert max-w-none">
+                                <h2 class="text-xl font-semibold mb-4">About</h2>
+                                <p class="text-gray-300 leading-relaxed">{podcast.description}</p>
+                            </div>
+                        )}
+                    </div>
+                </>
+            ) : (
+                <div class="flex items-center justify-center min-h-[50vh]">
+                    <div class="animate-pulse text-gray-500">Loading...</div>
+                </div>
+            )
+        }
+    </main>
+</AppLayout>

@@ -1,7 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import VerticalPosterCarousel from "@/components/landing/VerticalPosterCarousel.vue";
-import { Button } from "@/components/ui/button";
 
 if (Astro.locals.user) {
 	return Astro.redirect("/dashboard");
@@ -34,23 +33,18 @@ if (Astro.locals.user) {
 					synchronized and beautifully organized.
 				</p>
 				<div class="flex gap-4">
-					<Button
-						as="a"
+					<a
 						href="/login"
-						size="lg"
-						class="shadow hover:scale-105 transition-all"
+						class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-8 shadow hover:scale-105"
 					>
 						Get Started
-					</Button>
-					<Button
-						as="a"
+					</a>
+					<a
 						href="https://github.com/openrijal/traktdb"
-						variant="outline"
-						size="lg"
-						class="bg-background/50 backdrop-blur-sm hover:bg-accent hover:text-accent-foreground transition-all"
+						class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-input bg-background/50 backdrop-blur-sm hover:bg-accent hover:text-accent-foreground h-11 px-8"
 					>
 						GitHub
-					</Button>
+					</a>
 				</div>
 			</div>
 		</main>

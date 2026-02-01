@@ -58,7 +58,7 @@ export const upsertPodcastFromListenNotes = async (db: any, item: ListenNotesPod
         genres: item.genre_ids?.map(id => id.toString()) || [],
         description: item.description_original || null,
         totalEpisodes: item.total_episodes || null,
-        listenScore: item.listen_score || null,
+        listenScore: typeof item.listen_score === 'number' ? item.listen_score : null,
         updatedAt: new Date(),
     };
 

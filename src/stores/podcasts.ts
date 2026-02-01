@@ -12,16 +12,15 @@ interface PodcastItemState {
 }
 
 export const usePodcastStore = defineStore('podcasts', () => {
-    // Map of "itunesId" -> status object
     const items = ref<Record<string, PodcastItemState>>({});
     const isLoading = ref(false);
 
-    async function fetchStatus(itunesId: string) {
+    async function fetchStatus(externalId: string) {
         try {
-            const res = await fetch(`/api/podcasts/status?itunesId=${itunesId}`);
+            const res = await fetch(`/api/podcasts/status?externalId=${externalId}`);
             if (res.ok) {
                 const data = await res.json();
-                items.value[itunesId] = {
+                items.value[externalId] = {
                     status: data.status,
                     updatedAt: data.updatedAt,
                     progress: data.progress || 0
@@ -32,11 +31,10 @@ export const usePodcastStore = defineStore('podcasts', () => {
         }
     }
 
-    async function updateStatus(itunesId: string, status: UserPodcastStatus, progress?: number) {
-        const previous = items.value[itunesId];
+    async function updateStatus(externalId: string, status: UserPodcastStatus, podcastData?: any, progress?: number) {
+        const previous = items.value[externalId];
 
-        // Optimistic update
-        items.value[itunesId] = {
+        items.value[externalId] = {
             status: status,
             updatedAt: new Date().toISOString(),
             progress: progress !== undefined ? progress : (previous?.progress || 0)
@@ -49,7 +47,7 @@ export const usePodcastStore = defineStore('podcasts', () => {
                     'Content-Type': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest'
                 },
-                body: JSON.stringify({ itunesId, status, progress })
+                body: JSON.stringify({ externalId, status, progress, podcastData })
             });
 
             if (!res.ok) {
@@ -57,13 +55,12 @@ export const usePodcastStore = defineStore('podcasts', () => {
             }
         } catch (e) {
             console.error('Failed to update status', e);
-            // Revert
-            items.value[itunesId] = previous;
+            items.value[externalId] = previous;
         }
     }
 
-    function getStatus(itunesId: string): UserPodcastStatus {
-        return items.value[itunesId]?.status || null;
+    function getStatus(externalId: string): UserPodcastStatus {
+        return items.value[externalId]?.status || null;
     }
 
     return {

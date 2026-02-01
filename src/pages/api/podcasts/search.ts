@@ -1,10 +1,8 @@
 import type { APIRoute } from 'astro';
-import { createDb } from '@/lib/db';
 import { createListenNotes, type ListenNotesPodcast } from '@/lib/listennotes';
 import { createITunes } from '@/lib/itunes';
-import { upsertPodcast, upsertPodcastFromListenNotes } from '@/lib/services/podcasts';
 
-export const GET: APIRoute = async ({ request, locals }) => {
+export const GET: APIRoute = async ({ request }) => {
     const url = new URL(request.url);
     const query = url.searchParams.get('q');
     const limit = parseInt(url.searchParams.get('limit') || '10');
@@ -19,46 +17,35 @@ export const GET: APIRoute = async ({ request, locals }) => {
     const listenNotesApiKey = import.meta.env.LISTEN_NOTES_API_KEY;
     
     if (listenNotesApiKey) {
-        return searchWithListenNotes(query, limit, locals);
+        return searchWithListenNotes(query, limit, listenNotesApiKey);
     } else {
-        return searchWithItunes(query, limit, locals);
+        return searchWithItunes(query, limit);
     }
 };
 
-async function searchWithListenNotes(query: string, limit: number, locals: any) {
-    const db = createDb(locals.runtime.env);
-    const listenNotes = createListenNotes(import.meta.env.LISTEN_NOTES_API_KEY);
+async function searchWithListenNotes(query: string, limit: number, apiKey: string) {
+    const listenNotes = createListenNotes(apiKey);
 
     try {
         const searchResult = await listenNotes.searchPodcasts(query);
         const podcasts = searchResult.results.slice(0, limit);
         
-        const upsertedPodcasts = await Promise.all(
-            podcasts.map(async (podcast: ListenNotesPodcast) => {
-                try {
-                    const dbId = await upsertPodcastFromListenNotes(db, podcast);
-                    return {
-                        id: dbId,
-                        listenNotesId: podcast.id,
-                        collectionId: podcast.itunes_id,
-                        collectionName: podcast.title_original,
-                        artistName: podcast.publisher_original,
-                        artworkUrl100: podcast.thumbnail,
-                        artworkUrl600: podcast.image,
-                        description: podcast.description_original,
-                        totalEpisodes: podcast.total_episodes,
-                        listenScore: podcast.listen_score,
-                    };
-                } catch (e) {
-                    console.error('Failed to upsert podcast:', e);
-                    return null;
-                }
-            })
-        );
+        const formattedPodcasts = podcasts.map((podcast: ListenNotesPodcast) => ({
+            id: podcast.id,
+            listenNotesId: podcast.id,
+            itunesId: podcast.itunes_id,
+            title: podcast.title_original,
+            publisher: podcast.publisher_original,
+            image: podcast.image,
+            thumbnail: podcast.thumbnail,
+            description: podcast.description_original,
+            totalEpisodes: podcast.total_episodes,
+            listenScore: typeof podcast.listen_score === 'number' ? podcast.listen_score : null,
+        }));
 
         return new Response(
             JSON.stringify({
-                results: upsertedPodcasts.filter(Boolean),
+                results: formattedPodcasts,
                 total: searchResult.total,
                 source: 'listennotes',
             }),
@@ -79,25 +66,26 @@ async function searchWithListenNotes(query: string, limit: number, locals: any) 
     }
 }
 
-async function searchWithItunes(query: string, limit: number, locals: any) {
-    const db = createDb(locals.runtime.env);
+async function searchWithItunes(query: string, limit: number) {
     const itunes = createITunes();
 
     try {
         const result = await itunes.searchPodcasts(query, limit);
 
-        await Promise.all(
-            result.results.map(async (podcast) => {
-                try {
-                    await upsertPodcast(db, podcast);
-                } catch (e) {
-                    console.error('Failed to upsert podcast:', e);
-                }
-            })
-        );
+        const formattedPodcasts = result.results.map(podcast => ({
+            id: podcast.collectionId.toString(),
+            itunesId: podcast.collectionId,
+            title: podcast.collectionName,
+            publisher: podcast.artistName,
+            image: podcast.artworkUrl600 || podcast.artworkUrl100,
+            thumbnail: podcast.artworkUrl100,
+            description: null,
+            totalEpisodes: null,
+        }));
 
         return new Response(JSON.stringify({ 
-            ...result,
+            results: formattedPodcasts,
+            total: result.resultCount,
             source: 'itunes',
         }), {
             status: 200,

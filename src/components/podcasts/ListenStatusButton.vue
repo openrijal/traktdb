@@ -1,74 +1,105 @@
-
 <script setup lang="ts">
-import { computed, onMounted } from 'vue';
+import { onMounted, computed, ref, type PropType } from 'vue';
 import { usePodcastStore } from '@/stores/podcasts';
-import { Bookmark, Check, Headphones } from 'lucide-vue-next';
-import { ListenStatus } from '@/lib/constants';
+import { ListenStatus, ListenStatusLabels } from '@/lib/constants';
 import { Button } from '@/components/ui/button';
+import { ChevronDown, Headphones, ListPlus, Check, X } from 'lucide-vue-next';
 
-const props = defineProps<{
-  itunesId: string;
-}>();
-
-const store = usePodcastStore();
-
-onMounted(() => {
-  store.fetchStatus(props.itunesId);
+const props = defineProps({
+    externalId: {
+        type: String,
+        required: true
+    },
+    podcastData: {
+        type: Object as PropType<{
+            title: string;
+            publisher: string;
+            image?: string | null;
+            description?: string | null;
+            listenNotesId?: string;
+            itunesId?: number;
+        }>,
+        default: null
+    }
 });
 
-const status = computed(() => store.getStatus(props.itunesId));
+const store = usePodcastStore();
+const isOpen = ref(false);
+const menuRef = ref<HTMLElement | null>(null);
 
-const isPlanToListen = computed(() => status.value === ListenStatus.PLAN_TO_LISTEN);
-const isListening = computed(() => status.value === ListenStatus.LISTENING);
-const isCompleted = computed(() => status.value === ListenStatus.COMPLETED);
+onMounted(() => {
+    store.fetchStatus(props.externalId);
+    document.addEventListener('click', handleClickOutside);
+});
 
-const togglePlanToListen = () => {
-  if (isPlanToListen.value) {
-    store.updateStatus(props.itunesId, null);
-  } else {
-    store.updateStatus(props.itunesId, ListenStatus.PLAN_TO_LISTEN);
-  }
+const handleClickOutside = (e: MouseEvent) => {
+    if (menuRef.value && !menuRef.value.contains(e.target as Node)) {
+        isOpen.value = false;
+    }
 };
 
-const toggleListening = () => {
-  if (isListening.value) {
-    store.updateStatus(props.itunesId, null);
-  } else {
-    store.updateStatus(props.itunesId, ListenStatus.LISTENING);
-  }
+const currentStatus = computed(() => store.getStatus(props.externalId));
+
+const statusOptions = [
+    { value: ListenStatus.PLAN_TO_LISTEN, label: ListenStatusLabels[ListenStatus.PLAN_TO_LISTEN], icon: ListPlus },
+    { value: ListenStatus.LISTENING, label: ListenStatusLabels[ListenStatus.LISTENING], icon: Headphones },
+    { value: ListenStatus.COMPLETED, label: ListenStatusLabels[ListenStatus.COMPLETED], icon: Check },
+];
+
+const currentStatusLabel = computed(() => {
+    if (!currentStatus.value) return 'Add to Library';
+    return ListenStatusLabels[currentStatus.value];
+});
+
+const currentIcon = computed(() => {
+    const opt = statusOptions.find(o => o.value === currentStatus.value);
+    return opt?.icon || ListPlus;
+});
+
+const handleStatusChange = (status: ListenStatus | null) => {
+    store.updateStatus(props.externalId, status, props.podcastData);
+    isOpen.value = false;
 };
 
-const toggleCompleted = () => {
-  if (isCompleted.value) {
-    store.updateStatus(props.itunesId, null);
-  } else {
-    store.updateStatus(props.itunesId, ListenStatus.COMPLETED);
-  }
+const toggleMenu = () => {
+    isOpen.value = !isOpen.value;
 };
-
 </script>
 
 <template>
-  <div class="flex items-center gap-1">
-    <!-- Plan to Listen -->
-    <Button @click.stop="togglePlanToListen" size="icon" variant="ghost" class="rounded-full h-8 w-8 transition-colors"
-      :class="isPlanToListen ? 'bg-indigo-600 text-white hover:bg-indigo-700 hover:text-white' : 'bg-white/10 text-gray-300 hover:bg-white/20 hover:text-white'"
-      title="Want to Listen">
-      <Bookmark class="w-4 h-4" :class="{ 'fill-current': isPlanToListen }" />
-    </Button>
-
-    <!-- Listening -->
-    <Button @click.stop="toggleListening" size="icon" variant="ghost" class="rounded-full h-8 w-8 transition-colors"
-      :class="isListening ? 'bg-amber-600 text-white hover:bg-amber-700 hover:text-white' : 'bg-white/10 text-gray-300 hover:bg-white/20 hover:text-white'"
-      title="Listening">
-      <Headphones class="w-4 h-4" />
-    </Button>
-
-    <!-- Completed -->
-    <Button @click.stop="toggleCompleted" size="icon" variant="ghost" class="rounded-full h-8 w-8 transition-colors"
-      :class="isCompleted ? 'bg-green-600 text-white hover:bg-green-700 hover:text-white' : 'bg-white/10 text-gray-300 hover:bg-white/20 hover:text-white'"
-      title="Listened">
-      <Check class="w-4 h-4" />
-    </Button>
-  </div>
+    <div ref="menuRef" class="relative">
+        <Button
+            @click="toggleMenu"
+            :variant="currentStatus ? 'secondary' : 'default'"
+            class="gap-2"
+        >
+            <component :is="currentIcon" class="w-4 h-4" />
+            {{ currentStatusLabel }}
+            <ChevronDown class="w-4 h-4 ml-1 opacity-50" :class="{ 'rotate-180': isOpen }" />
+        </Button>
+        
+        <div 
+            v-if="isOpen"
+            class="absolute top-full left-0 mt-2 w-48 bg-gray-900 border border-gray-800 rounded-lg shadow-xl z-50 overflow-hidden"
+        >
+            <button
+                v-for="option in statusOptions"
+                :key="option.value"
+                @click="handleStatusChange(option.value)"
+                class="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-left hover:bg-gray-800 transition-colors"
+                :class="{ 'bg-gray-800 text-indigo-400': currentStatus === option.value }"
+            >
+                <component :is="option.icon" class="w-4 h-4" />
+                {{ option.label }}
+            </button>
+            <button
+                v-if="currentStatus"
+                @click="handleStatusChange(null)"
+                class="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-left text-red-400 hover:bg-gray-800 transition-colors border-t border-gray-800"
+            >
+                <X class="w-4 h-4" />
+                Remove from Library
+            </button>
+        </div>
+    </div>
 </template>
