@@ -13,6 +13,7 @@ export default defineConfig({
     appEntrypoint: '/src/setup'
   })],
 
+  server: { host: true },
   vite: {
     plugins: [tailwindcss()]
   }
