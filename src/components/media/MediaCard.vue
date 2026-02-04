@@ -102,7 +102,7 @@ const hasNewEpisodes = computed(() => {
                     {{
                         props.media.title }}</h3>
                 <div class="flex justify-between items-center mt-1 text-xs text-gray-400">
-                    <span class="capitalize">{{ mediaType }}</span>
+                    <span>{{ mediaType === 'tv' ? 'TV' : 'Movie' }}</span>
                     <span>{{ year }}</span>
                 </div>
             </CardContent>
