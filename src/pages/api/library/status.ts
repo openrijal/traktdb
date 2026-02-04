@@ -23,7 +23,6 @@ export const GET: APIRoute = async ({ request, locals }) => {
     const typeParam = url.searchParams.get('type');
 
     if (!tmdbIdParam || !typeParam) {
-        // Option: return all items if no params? For now, require params.
         return new Response(JSON.stringify({ error: 'Missing tmdbId or type' }), { status: 400 });
     }
 
@@ -74,22 +73,17 @@ export const POST: APIRoute = async ({ request, locals }) => {
         return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
     }
 
-    // CSRF Protection: Check for custom header
+    // CSRF Protection: Require X-Requested-With header
+    // This is a standard defense for REST APIs consumed by browsers.
     const requestedWith = request.headers.get('x-requested-with');
-    const origin = request.headers.get('origin');
-
-    // Simple check: Require X-Requested-With: XMLHttpRequest OR matching Origin
-    if (requestedWith !== 'XMLHttpRequest' && !origin?.includes('localhost') && !origin?.includes('traktdb')) {
-        // Note: In production, you'd stricter Origin/Host checks. For now, requiring the custom header is a strong signal.
-        if (requestedWith !== 'XMLHttpRequest') {
-            return new Response(JSON.stringify({ error: 'Missing Anti-CSRF Header' }), { status: 403 });
-        }
+    
+    if (requestedWith !== 'XMLHttpRequest') {
+        return new Response(JSON.stringify({ error: 'Missing Anti-CSRF Header' }), { status: 403 });
     }
 
     try {
         const body = await request.json();
         const { tmdbId, type, status } = body;
-        // status: WatchStatus | null
 
         if (!tmdbId || !type || !status) {
             return new Response(JSON.stringify({ error: 'Missing required fields' }), { status: 400 });
@@ -112,7 +106,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
             } else {
                 const show = await tmdb.getTV(tmdbId);
                 tmdbItem = show;
-                // Upsert seasons for TV shows to ensure we have data for Epic 5 later
                 const newId = await upsertMediaItem(db, tmdbItem, type);
                 if (newId && show.seasons) {
                     await upsertSeasons(db, show.seasons, newId);
@@ -138,13 +131,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
                 updatedAt: new Date(),
             })
             .onConflictDoUpdate({
-                target: [userProgress.userId, userProgress.mediaItemId], // Constraint naming?
-                // Wait, I didn't define a unique constraint on (userId, mediaItemId) in schema.ts explicitly using `uniqueIndex` or `primaryKey`.
-                // Let's check schema.ts.
-                // The schema definition for userProgress has a serial ID primary key.
-                // But conceptually (userId, mediaItemId) should be unique.
-                // If I don't have a unique constraint, onConflictDoUpdate will fail or insert duplicates.
-                // I MUST CHECK SCHEMA.TS AGAIN.
+                target: [userProgress.userId, userProgress.mediaItemId], 
                 set: {
                     status: status,
                     updatedAt: new Date(),

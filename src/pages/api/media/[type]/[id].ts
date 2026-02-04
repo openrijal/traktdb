@@ -1,12 +1,19 @@
 import type { APIRoute } from 'astro';
 import { createTmdb, type TMDBMediaItem, type TMDBSeason } from '@/lib/tmdb';
+import { createAuth } from '@/lib/auth';
 import { MediaType } from '@/lib/constants';
 
 
-export const GET: APIRoute = async ({ params, locals }) => {
+export const GET: APIRoute = async ({ params, locals, request }) => {
     // @ts-ignore
     const env = locals.runtime?.env || import.meta.env;
+    const auth = createAuth(env);
     const tmdb = createTmdb(env);
+
+    const session = await auth.api.getSession({ headers: request.headers });
+    if (!session) {
+        return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
+    }
 
     const { type, id } = params;
     const tmdbId = parseInt(id!);
