@@ -26,3 +26,6 @@ pnpm-debug.log*
 
 # deployment related
 .wrangler/
+# tunnel dev artifacts
+vite.config.tunnel.ts
+tunnel.sh

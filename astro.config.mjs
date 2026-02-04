@@ -15,6 +15,9 @@ export default defineConfig({
 
   server: { host: true },
   vite: {
-    plugins: [tailwindcss()]
+    plugins: [tailwindcss()],
+    server: {
+      allowedHosts: process.env.TUNNEL_HOST ? [process.env.TUNNEL_HOST] : undefined
+    }
   }
 });
