@@ -44,7 +44,7 @@ All tasks complete. See closed issues #9, #10, #11.
 - [x] T015 Set up database migrations
 - [x] T016 Implement TMDB API integration
 - [x] T017 Create library status API routes
-- [ ] T018 Complete Phase 2: Library Management (#8 - OPEN)
+- [x] T018 Complete Phase 2: Library Management (#8 - CLOSED)
 
 ### Epic 4: Media Management UI (Original traktdb #4)
 - [x] T019 Create media search & discovery
