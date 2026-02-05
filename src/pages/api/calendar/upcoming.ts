@@ -2,7 +2,7 @@ import type { APIRoute } from 'astro';
 import { createTrakt } from '@/lib/trakt';
 import { groupByDate } from '@/lib/date';
 import { createDb } from '@/lib/db';
-import { accounts } from 'drizzle/schema';
+import { accountConnections } from 'drizzle/schema';
 import { and, eq } from 'drizzle-orm';
 import { format, addDays } from 'date-fns';
 
@@ -20,14 +20,13 @@ export const GET: APIRoute = async ({ request, locals }) => {
 
   try {
     const connection = await db.select({
-      accessToken: accounts.accessToken,
-      providerId: accounts.providerId,
-      accountId: accounts.accountId,
+      accessToken: accountConnections.accessToken,
+      providerUserId: accountConnections.providerUserId,
     })
-      .from(accounts)
+      .from(accountConnections)
       .where(and(
-        eq(accounts.userId, session.user.id),
-        eq(accounts.providerId, 'trakt')
+        eq(accountConnections.userId, session.user.id),
+        eq(accountConnections.provider, 'trakt')
       ))
       .then((r) => r[0]);
 
@@ -36,7 +35,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
     }
 
     const trakt = createTrakt({
-      TRAKT_CLIENT_ID: connection.accountId || '',
+      TRAKT_CLIENT_ID: connection.providerUserId || '',
       TRAKT_ACCESS_TOKEN: connection.accessToken,
     });
 
