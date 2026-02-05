@@ -23,16 +23,16 @@ const outgoingCount = computed(() => store.outgoingRequests.length);
 <template>
     <div class="space-y-6">
         <Tabs v-model="activeTab" class="w-full">
-            <TabsList class="grid w-full grid-cols-3 bg-gray-900/50 p-1 rounded-xl">
+            <TabsList class="grid w-full grid-cols-3 bg-card/50 p-1 rounded-xl">
                 <TabsTrigger value="list" class="flex items-center gap-2">
                     <Users class="w-4 h-4" />
                     Friends
-                    <span v-if="friendsCount > 0" class="ml-1 bg-gray-800 text-gray-300 text-[10px] px-1.5 py-0.5 rounded-full">{{ friendsCount }}</span>
+                    <span v-if="friendsCount > 0" class="ml-1 bg-secondary text-secondary-foreground text-[10px] px-1.5 py-0.5 rounded-full">{{ friendsCount }}</span>
                 </TabsTrigger>
                 <TabsTrigger value="requests" class="flex items-center gap-2 relative">
                     <Mail class="w-4 h-4" />
                     Requests
-                    <span v-if="incomingCount > 0" class="ml-1 bg-indigo-600 text-white text-[10px] px-1.5 py-0.5 rounded-full animate-pulse">{{ incomingCount }}</span>
+                    <span v-if="incomingCount > 0" class="ml-1 bg-primary text-foreground text-[10px] px-1.5 py-0.5 rounded-full animate-pulse">{{ incomingCount }}</span>
                 </TabsTrigger>
                 <TabsTrigger value="search" class="flex items-center gap-2">
                     <UserPlus class="w-4 h-4" />
@@ -43,17 +43,17 @@ const outgoingCount = computed(() => store.outgoingRequests.length);
             <!-- Friends List -->
             <TabsContent value="list" class="mt-6 space-y-4 outline-none">
                 <div v-if="store.isLoading" class="flex justify-center py-12">
-                    <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-indigo-500"></div>
+                    <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
                 </div>
                 
                 <div v-else-if="store.friends.length > 0" class="grid gap-3 md:grid-cols-2">
                     <FriendCard v-for="friend in store.friends" :key="friend.friendshipId" :user="friend" :friendshipId="friend.friendshipId" />
                 </div>
 
-                <div v-else class="text-center py-20 text-gray-500 bg-gray-900/20 rounded-xl border border-dashed border-white/5">
+                <div v-else class="text-center py-20 text-muted-foreground bg-card/20 rounded-xl border border-dashed border-white/5">
                     <Users class="w-12 h-12 mx-auto mb-3 opacity-20" />
                     <p class="text-lg">You haven't added any friends yet.</p>
-                    <button @click="activeTab = 'search'" class="text-indigo-400 hover:underline mt-2">Find friends</button>
+                    <button @click="activeTab = 'search'" class="text-primary hover:underline mt-2">Find friends</button>
                 </div>
             </TabsContent>
 
@@ -62,28 +62,28 @@ const outgoingCount = computed(() => store.outgoingRequests.length);
                 
                 <!-- Incoming -->
                 <div class="space-y-4">
-                    <h3 class="text-sm font-medium text-gray-400 flex items-center gap-2">
+                    <h3 class="text-sm font-medium text-muted-foreground flex items-center gap-2">
                         Incoming Requests
-                        <span class="text-xs bg-gray-800 px-2 py-0.5 rounded-full">{{ incomingCount }}</span>
+                        <span class="text-xs bg-secondary px-2 py-0.5 rounded-full">{{ incomingCount }}</span>
                     </h3>
                     
                     <div v-if="incomingCount > 0" class="grid gap-3 md:grid-cols-2">
                         <FriendCard v-for="req in store.incomingRequests" :key="req.friendshipId" :user="req" :friendshipId="req.friendshipId" />
                     </div>
-                    <div v-else class="text-sm text-gray-600 italic px-4">No pending incoming requests.</div>
+                    <div v-else class="text-sm text-muted-foreground italic px-4">No pending incoming requests.</div>
                 </div>
 
                 <!-- Outgoing -->
                 <div class="space-y-4">
-                    <h3 class="text-sm font-medium text-gray-400 flex items-center gap-2">
+                    <h3 class="text-sm font-medium text-muted-foreground flex items-center gap-2">
                         Outgoing Requests
-                        <span class="text-xs bg-gray-800 px-2 py-0.5 rounded-full">{{ outgoingCount }}</span>
+                        <span class="text-xs bg-secondary px-2 py-0.5 rounded-full">{{ outgoingCount }}</span>
                     </h3>
                     
                     <div v-if="outgoingCount > 0" class="grid gap-3 md:grid-cols-2">
                         <FriendCard v-for="req in store.outgoingRequests" :key="req.friendshipId" :user="req" :friendshipId="req.friendshipId" />
                     </div>
-                    <div v-else class="text-sm text-gray-600 italic px-4">No pending outgoing requests.</div>
+                    <div v-else class="text-sm text-muted-foreground italic px-4">No pending outgoing requests.</div>
                 </div>
             </TabsContent>
 
