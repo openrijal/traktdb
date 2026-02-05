@@ -153,26 +153,26 @@ onUnmounted(() => {
                 @keydown="handleKeydown"
                 @focus="query.length >= 2 && (isOpen = true)"
                 placeholder="Search... (⌘K)"
-                class="pl-9 pr-8 h-9 bg-gray-900/50 border-gray-800 rounded-lg focus-visible:ring-indigo-500/50 text-sm"
+                class="pl-9 pr-8 h-9 bg-card/50 border-border rounded-lg focus-visible:ring-primary/50 text-sm"
             />
             <button
                 v-if="query"
                 @click="clearSearch"
-                class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
             >
                 <X class="h-3.5 w-3.5" />
             </button>
             <div v-if="isLoading && !query" class="absolute right-3 top-1/2 -translate-y-1/2">
-                <Loader2 class="h-4 w-4 animate-spin text-indigo-500" />
+                <Loader2 class="h-4 w-4 animate-spin text-primary" />
             </div>
         </div>
 
         <!-- Dropdown Results -->
         <div
             v-if="isOpen && (results.length > 0 || isLoading)"
-            class="absolute top-full left-0 right-0 mt-1.5 bg-gray-900 border border-gray-800 rounded-lg shadow-xl z-50 overflow-hidden max-h-80 overflow-y-auto"
+            class="absolute top-full left-0 right-0 mt-1.5 bg-card border border-border rounded-lg shadow-md z-50 overflow-hidden max-h-80 overflow-y-auto"
         >
-            <div v-if="isLoading && results.length === 0" class="p-4 text-center text-gray-400">
+            <div v-if="isLoading && results.length === 0" class="p-4 text-center text-muted-foreground">
                 <Loader2 class="h-5 w-5 animate-spin mx-auto" />
             </div>
 
@@ -181,11 +181,11 @@ onUnmounted(() => {
                 :key="item.id"
                 @click="selectItem(item)"
                 :class="cn(
-                    'w-full flex items-center gap-3 p-2.5 text-left hover:bg-gray-800/50 transition-colors border-b border-gray-800/50 last:border-0',
-                    selectedIndex === index && 'bg-gray-800/50'
+                    'w-full flex items-center gap-3 p-2.5 text-left hover:bg-secondary/50 transition-colors border-b border-border/50 last:border-0',
+                    selectedIndex === index && 'bg-secondary/50'
                 )"
             >
-                <div class="w-8 h-12 bg-gray-800 rounded overflow-hidden flex-shrink-0">
+                <div class="w-8 h-12 bg-secondary rounded overflow-hidden flex-shrink-0">
                     <img
                         v-if="getPosterUrl(item.poster_path)"
                         :src="getPosterUrl(item.poster_path)!"
@@ -193,13 +193,13 @@ onUnmounted(() => {
                         class="w-full h-full object-cover"
                     />
                     <div v-else class="w-full h-full flex items-center justify-center">
-                        <Film v-if="item.media_type === 'movie'" class="w-4 h-4 text-gray-600" />
-                        <Tv v-else class="w-4 h-4 text-gray-600" />
+                        <Film v-if="item.media_type === 'movie'" class="w-4 h-4 text-muted-foreground" />
+                        <Tv v-else class="w-4 h-4 text-muted-foreground" />
                     </div>
                 </div>
                 <div class="flex-1 min-w-0">
-                    <p class="font-medium text-white text-sm truncate">{{ item.title }}</p>
-                    <div class="flex items-center gap-1.5 text-xs text-gray-400">
+                    <p class="font-medium text-foreground text-sm truncate">{{ item.title }}</p>
+                    <div class="flex items-center gap-1.5 text-xs text-muted-foreground">
                         <span class="uppercase tracking-wide">{{ item.media_type === 'tv' ? 'TV' : 'Movie' }}</span>
                         <span>·</span>
                         <span>{{ item.year }}</span>
@@ -211,7 +211,7 @@ onUnmounted(() => {
             <button
                 v-if="results.length > 0"
                 @click="goToSearchPage"
-                class="w-full p-2.5 text-center text-sm text-indigo-400 hover:bg-gray-800/50 transition-colors border-t border-gray-800"
+                class="w-full p-2.5 text-center text-sm text-primary hover:bg-secondary/50 transition-colors border-t border-border"
             >
                 View all results →
             </button>
@@ -220,7 +220,7 @@ onUnmounted(() => {
         <!-- No Results -->
         <div
             v-if="isOpen && !isLoading && query.length >= 2 && results.length === 0"
-            class="absolute top-full left-0 right-0 mt-1.5 bg-gray-900 border border-gray-800 rounded-lg shadow-xl z-50 p-4 text-center text-gray-400 text-sm"
+            class="absolute top-full left-0 right-0 mt-1.5 bg-card border border-border rounded-lg shadow-md z-50 p-4 text-center text-muted-foreground text-sm"
         >
             No results found for "{{ query }}"
         </div>

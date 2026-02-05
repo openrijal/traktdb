@@ -72,11 +72,11 @@ const formatType = (type: string) => type === MediaType.TV ? 'TV Show' : 'Movie'
                 v-model="query" 
                 @input="handleInput" 
                 placeholder="Search movies, tv shows..." 
-                class="pl-12 h-12 text-lg bg-gray-900/50 border-gray-800 rounded-xl focus-visible:ring-indigo-500/50 transition-all shadow-lg"
+                class="pl-12 h-12 text-lg bg-card/50 border-border rounded-xl focus-visible:ring-primary/50 transition-all shadow-lg"
                 autofocus
             />
             <div v-if="isLoading" class="absolute right-4 top-4">
-                <Loader2 class="h-5 w-5 animate-spin text-indigo-500" />
+                <Loader2 class="h-5 w-5 animate-spin text-primary" />
             </div>
         </div>
 
@@ -91,17 +91,17 @@ const formatType = (type: string) => type === MediaType.TV ? 'TV Show' : 'Movie'
         </div>
 
         <!-- No Results State -->
-        <div v-else-if="hasSearched && !isLoading" class="text-center py-20 text-gray-500">
+        <div v-else-if="hasSearched && !isLoading" class="text-center py-20 text-muted-foreground">
             <Film class="w-16 h-16 mx-auto mb-4 opacity-20" />
-            <h3 class="text-lg font-medium text-gray-400">No results found</h3>
+            <h3 class="text-lg font-medium text-muted-foreground">No results found</h3>
             <p>Try adjusting your search query</p>
         </div>
 
         <!-- Empty State -->
-        <div v-else-if="!hasSearched && !isLoading" class="text-center py-32 text-gray-500">
+        <div v-else-if="!hasSearched && !isLoading" class="text-center py-32 text-muted-foreground">
             <SearchIcon class="w-20 h-20 mx-auto mb-6 opacity-10" />
-            <h2 class="text-2xl font-semibold text-gray-300 mb-2">Search TracktDB</h2>
-            <p class="max-w-md mx-auto text-gray-400">Find movies and TV shows to track. Just start typing above.</p>
+            <h2 class="text-2xl font-semibold text-secondary-foreground mb-2">Search TracktDB</h2>
+            <p class="max-w-md mx-auto text-muted-foreground">Find movies and TV shows to track. Just start typing above.</p>
         </div>
     </div>
 </template>
