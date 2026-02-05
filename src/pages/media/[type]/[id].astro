@@ -1,6 +1,7 @@
 ---
 import AppLayout from "@/layouts/AppLayout.astro";
 import MediaHeader from "@/components/media/MediaHeader.vue";
+import SeasonsList from "@/components/media/SeasonsList.vue";
 import { Button } from "@/components/ui/button";
 import { MediaType } from "@/lib/constants";
 
@@ -19,7 +20,6 @@ try {
 
     if (res.ok) {
         mediaItem = await res.json();
-        // Inject type into the item for the component to use
         mediaItem.type = type;
     } else {
         error = `Failed to load ${type}`;
@@ -53,6 +53,13 @@ try {
                     <MediaHeader client:load media={mediaItem} />
 
                     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                        {type === MediaType.TV && mediaItem.seasons && mediaItem.seasons.length > 0 && (
+                            <SeasonsList
+                                client:visible
+                                tvId={mediaItem.id}
+                                seasons={mediaItem.seasons}
+                            />
+                        )}
                     </div>
                 </>
             ) : (
