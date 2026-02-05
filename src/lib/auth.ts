@@ -61,6 +61,7 @@ export const createAuth = (env: any, dbInstance?: Db) => {
     };
 
     return betterAuth({
+        trustedOrigins: ["https://traktdb.niteshrijal.com"],
         secret: env.AUTH_SECRET || import.meta.env.AUTH_SECRET,
         database: adapter,
         socialProviders: {

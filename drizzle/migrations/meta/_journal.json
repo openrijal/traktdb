@@ -71,6 +71,13 @@
       "when": 1768959894140,
       "tag": "0009_nosy_emma_frost",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1770245500133,
+      "tag": "0010_smooth_the_executioner",
+      "breakpoints": true
     }
   ]
 }

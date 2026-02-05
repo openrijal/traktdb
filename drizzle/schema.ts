@@ -188,3 +188,18 @@ export const friendships = pgTable('friendships', {
 }, (t) => ({
     unq: uniqueIndex('friendships_user_friend_unique').on(t.userId, t.friendId),
 }));
+
+export const accountConnections = pgTable('account_connections', {
+    id: serial('id').primaryKey(),
+    userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+    provider: text('provider').notNull(), // 'trakt'
+    accessToken: text('access_token').notNull(),
+    refreshToken: text('refresh_token'),
+    expiresAt: timestamp('expires_at'),
+    providerUserId: text('provider_user_id'), // trakt user id
+    providerUsername: text('provider_username'), // trakt username
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}, (t) => ({
+    unq: uniqueIndex('account_connections_user_provider_unique').on(t.userId, t.provider),
+}));
