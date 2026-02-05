@@ -1,6 +1,13 @@
 @import "tailwindcss";
 
+/* ============================================
+   DESIGN TOKEN SYSTEM - TraktDB
+   Based on: Stone (warm gray) + Sky (blue) + Orange
+   Strategy: CSS variables only, no shadcn changes
+   ============================================ */
+
 @theme {
+  /* === Color Scale Mappings === */
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
@@ -28,10 +35,46 @@
   --color-card: hsl(var(--card));
   --color-card-foreground: hsl(var(--card-foreground));
 
+  /* === Border Radius Scale === */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
   --radius-lg: var(--radius);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-sm: calc(var(--radius) - 4px);
+  --radius-full: 9999px;
 
+  /* === Shadow Tokens (Flat Design - Max 2 Levels) === */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+
+  /* === Spacing Scale (4px units) === */
+  --spacing-1: 0.25rem;
+  --spacing-2: 0.5rem;
+  --spacing-3: 0.75rem;
+  --spacing-4: 1rem;
+  --spacing-5: 1.25rem;
+  --spacing-6: 1.5rem;
+  --spacing-8: 2rem;
+  --spacing-10: 2.5rem;
+  --spacing-12: 3rem;
+  --spacing-16: 4rem;
+
+  /* === Typography Scale === */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+
+  /* === Container Max-Widths (Fluid Strategy) === */
+  --container-sm: 640px;
+  --container-md: 768px;
+  --container-lg: 1024px;
+  --container-xl: 1280px;
+  --container-2xl: 1400px;
+
+  /* === Animations === */
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
 
@@ -56,42 +99,222 @@
   }
 }
 
-/*
-  Based on Shadcn Zinc Dark Theme
-*/
+/* ============================================
+   COLOR SCALES
+   ============================================ */
+
 :root {
-  --background: 230 25% 6%;
-  --foreground: 210 40% 98%;
+  /* === Stone (Warm Gray) Scale === */
+  --stone-50: 60 9% 98%;
+  --stone-100: 60 5% 96%;
+  --stone-200: 20 6% 90%;
+  --stone-300: 24 6% 83%;
+  --stone-400: 24 5% 64%;
+  --stone-500: 25 5% 45%;
+  --stone-600: 33 5% 32%;
+  --stone-700: 30 6% 25%;
+  --stone-800: 12 6% 15%;
+  --stone-900: 24 10% 10%;
+  --stone-950: 20 14% 4%;
 
-  --card: 230 25% 10%;
-  --card-foreground: 210 40% 98%;
+  /* === Sky (Blue) Scale - Primary === */
+  --sky-50: 204 100% 97%;
+  --sky-100: 204 94% 94%;
+  --sky-200: 201 94% 86%;
+  --sky-300: 199 95% 74%;
+  --sky-400: 198 93% 60%;
+  --sky-500: 199 89% 48%;
+  --sky-600: 200 98% 39%;
+  --sky-700: 201 96% 32%;
+  --sky-800: 201 90% 27%;
+  --sky-900: 202 80% 24%;
+  --sky-950: 204 80% 16%;
 
-  --popover: 230 25% 10%;
-  --popover-foreground: 210 40% 98%;
+  /* === Orange Scale - Accent === */
+  --orange-50: 33 100% 96%;
+  --orange-100: 34 100% 92%;
+  --orange-200: 32 98% 83%;
+  --orange-300: 31 97% 72%;
+  --orange-400: 27 96% 61%;
+  --orange-500: 25 95% 53%;
+  --orange-600: 21 90% 48%;
+  --orange-700: 17 88% 40%;
+  --orange-800: 15 79% 34%;
+  --orange-900: 15 75% 28%;
+  --orange-950: 13 81% 15%;
 
-  --primary: 221 83% 53%;
-  --primary-foreground: 210 40% 98%;
-
-  --secondary: 220 20% 18%;
-  --secondary-foreground: 210 40% 98%;
-
-  --muted: 220 20% 18%;
-  --muted-foreground: 215 20% 65%;
-
-  --accent: 220 20% 18%;
-  --accent-foreground: 210 40% 98%;
-
-  --destructive: 0 62.8% 30.6%;
-  --destructive-foreground: 0 0% 98%;
-
-  --border: 220 20% 18%;
-  --input: 220 20% 18%;
-  --ring: 221 83% 53%;
-
+  /* === Base Radius === */
   --radius: 0.75rem;
 }
+
+/* ============================================
+   DARK THEME (Default)
+   ============================================ */
+
+:root {
+  --background: var(--stone-950);
+  --foreground: var(--stone-50);
+
+  --card: var(--stone-900);
+  --card-foreground: var(--stone-50);
+
+  --popover: var(--stone-900);
+  --popover-foreground: var(--stone-50);
+
+  --primary: var(--sky-500);
+  --primary-foreground: var(--stone-50);
+
+  --secondary: var(--stone-800);
+  --secondary-foreground: var(--stone-200);
+
+  --muted: var(--stone-800);
+  --muted-foreground: var(--stone-400);
+
+  --accent: var(--orange-500);
+  --accent-foreground: var(--stone-50);
+
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: var(--stone-50);
+
+  --border: var(--stone-700);
+  --input: var(--stone-800);
+  --ring: var(--sky-500);
+}
+
+/* ============================================
+   LIGHT THEME
+   ============================================ */
+
+.light,
+[data-theme="light"] {
+  --background: var(--stone-50);
+  --foreground: var(--stone-900);
+
+  --card: 0 0% 100%;
+  --card-foreground: var(--stone-900);
+
+  --popover: 0 0% 100%;
+  --popover-foreground: var(--stone-900);
+
+  --primary: var(--sky-600);
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: var(--stone-100);
+  --secondary-foreground: var(--stone-700);
+
+  --muted: var(--stone-100);
+  --muted-foreground: var(--stone-500);
+
+  --accent: var(--orange-500);
+  --accent-foreground: 0 0% 100%;
+
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: var(--stone-200);
+  --input: var(--stone-100);
+  --ring: var(--sky-600);
+}
+
+/* System preference detection */
+@media (prefers-color-scheme: light) {
+  :root:not(.dark):not([data-theme="dark"]) {
+    --background: var(--stone-50);
+    --foreground: var(--stone-900);
+
+    --card: 0 0% 100%;
+    --card-foreground: var(--stone-900);
+
+    --popover: 0 0% 100%;
+    --popover-foreground: var(--stone-900);
+
+    --primary: var(--sky-600);
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: var(--stone-100);
+    --secondary-foreground: var(--stone-700);
+
+    --muted: var(--stone-100);
+    --muted-foreground: var(--stone-500);
+
+    --accent: var(--orange-500);
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: var(--stone-200);
+    --input: var(--stone-100);
+    --ring: var(--sky-600);
+  }
+}
+
+/* ============================================
+   BASE STYLES
+   ============================================ */
 
 body {
   @apply bg-background text-foreground antialiased border-border;
   font-feature-settings: "rlig" 1, "calt" 1;
+}
+
+/* ============================================
+   REDUCED MOTION SUPPORT
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================
+   RESPONSIVE CONTAINER
+   ============================================ */
+
+.container-fluid {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--spacing-4);
+  padding-right: var(--spacing-4);
+}
+
+@media (min-width: 640px) {
+  .container-fluid {
+    max-width: var(--container-sm);
+    padding-left: var(--spacing-6);
+    padding-right: var(--spacing-6);
+  }
+}
+
+@media (min-width: 768px) {
+  .container-fluid {
+    max-width: var(--container-md);
+  }
+}
+
+@media (min-width: 1024px) {
+  .container-fluid {
+    max-width: var(--container-lg);
+    padding-left: var(--spacing-8);
+    padding-right: var(--spacing-8);
+  }
+}
+
+@media (min-width: 1280px) {
+  .container-fluid {
+    max-width: var(--container-xl);
+  }
+}
+
+@media (min-width: 1536px) {
+  .container-fluid {
+    max-width: var(--container-2xl);
+  }
 }
