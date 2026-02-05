@@ -4,7 +4,8 @@ import { createDb } from '@/lib/db';
 import { mediaItems, userProgress } from 'drizzle/schema';
 import { and, eq, sql } from 'drizzle-orm';
 import { createTmdb } from '@/lib/tmdb';
-import { upsertMediaItem, upsertSeasons } from '@/lib/services/media';
+import { upsertMediaItem, upsertSeasons, bulkUpdateEpisodeStatus } from '@/lib/services/media';
+import { createTrakt } from '@/lib/services/trakt-client';
 import { MediaType, WatchStatus } from '@/lib/constants';
 
 export const GET: APIRoute = async ({ request, locals }) => {
@@ -76,7 +77,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     // CSRF Protection: Require X-Requested-With header
     // This is a standard defense for REST APIs consumed by browsers.
     const requestedWith = request.headers.get('x-requested-with');
-    
+
     if (requestedWith !== 'XMLHttpRequest') {
         return new Response(JSON.stringify({ error: 'Missing Anti-CSRF Header' }), { status: 403 });
     }
@@ -131,12 +132,34 @@ export const POST: APIRoute = async ({ request, locals }) => {
                 updatedAt: new Date(),
             })
             .onConflictDoUpdate({
-                target: [userProgress.userId, userProgress.mediaItemId], 
+                target: [userProgress.userId, userProgress.mediaItemId],
                 set: {
                     status: status,
                     updatedAt: new Date(),
                 }
             });
+
+        // 3. Trigger Side Effects for TV Shows
+        if (type === MediaType.TV) {
+            if (status === WatchStatus.COMPLETED) {
+                await bulkUpdateEpisodeStatus(db, session.user.id, mediaItemId, true, env);
+            } else if (status === WatchStatus.PLAN_TO_WATCH) {
+                // Reset progress if moving back to plan to watch (as requested: "implies I wanna remove that status... and all episodes should be marked as unwatched")
+                await bulkUpdateEpisodeStatus(db, session.user.id, mediaItemId, false, env);
+            }
+        }
+
+        // 4. Sync to Trakt
+        try {
+            const trakt = createTrakt(env, session.user.id);
+            if (status === WatchStatus.COMPLETED) {
+                await trakt.syncHistory({ tmdbId, type, watchedAt: new Date() }, 'add');
+            } else if (status === WatchStatus.PLAN_TO_WATCH) {
+                await trakt.syncHistory({ tmdbId, type }, 'remove');
+            }
+        } catch (e) {
+            console.error('Trakt sync failed', e);
+        }
 
         return new Response(JSON.stringify({ success: true, status }), { status: 200 });
 
