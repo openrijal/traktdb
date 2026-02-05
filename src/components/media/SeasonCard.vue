@@ -35,7 +35,7 @@ const props = defineProps<Props>();
 const emit = defineEmits<{
   toggle: [seasonNumber: number];
   toggleEpisode: [episodeId: number, watched: boolean];
-  toggleSeason: [seasonId: number, episodes: Episode[]];
+  toggleSeason: [seasonId: number, episodes: Episode[], watched: boolean];
 }>();
 
 const togglingEpisode = ref<number | null>(null);
@@ -93,13 +93,9 @@ const handleEpisodeToggle = async (episode: Episode) => {
 
 const handleMarkSeasonComplete = async () => {
   if (isSeasonComplete.value) {
-    // Mark all unwatched
-    const unwatched = props.episodes.filter((ep: Episode) => !ep.watched);
-    for (const ep of unwatched) {
-      emit('toggleEpisode', ep.id, true);
-    }
+    emit('toggleSeason', props.season.id, props.episodes, !isSeasonComplete.value);
   } else {
-    emit('toggleSeason', props.season.id, props.episodes);
+    emit('toggleSeason', props.season.id, props.episodes, true);
   }
 };
 </script>

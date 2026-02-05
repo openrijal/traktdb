@@ -32,7 +32,7 @@ const toggleWatchlist = () => {
   }
 };
 
-const markAllEpisodesWatched = async () => {
+const markAllEpisodesWatched = async (markWatched: boolean) => {
   if (props.type !== MediaType.TV) return;
   
   markingAllEpisodes.value = true;
@@ -44,16 +44,17 @@ const markAllEpisodesWatched = async () => {
       },
       body: JSON.stringify({
         tvId: props.tmdbId,
-        markWatched: true,
+        markWatched,
       }),
     });
 
     if (response.ok) {
-      // Update the TV series status to completed
-      store.updateStatus(props.tmdbId, props.type, WatchStatus.COMPLETED);
+      // Update the TV series status
+      const newStatus = markWatched ? WatchStatus.COMPLETED : null;
+      store.updateStatus(props.tmdbId, props.type, newStatus);
     }
   } catch (error) {
-    console.error('Failed to mark all episodes as watched:', error);
+    console.error('Failed to update episodes status:', error);
   } finally {
     markingAllEpisodes.value = false;
   }
@@ -61,10 +62,14 @@ const markAllEpisodesWatched = async () => {
 
 const toggleWatched = () => {
   if (isWatched.value) {
-    store.updateStatus(props.tmdbId, props.type, null);
+    if (props.type === MediaType.TV) {
+      markAllEpisodesWatched(false);
+    } else {
+      store.updateStatus(props.tmdbId, props.type, null);
+    }
   } else {
     if (props.type === MediaType.TV) {
-      markAllEpisodesWatched();
+      markAllEpisodesWatched(true);
     } else {
       store.updateStatus(props.tmdbId, props.type, WatchStatus.COMPLETED);
     }

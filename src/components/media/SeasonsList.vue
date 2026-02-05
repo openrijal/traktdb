@@ -40,6 +40,7 @@ interface Props {
 const props = defineProps<Props>();
 const emit = defineEmits<{
   error: [message: string];
+  retry: [];
 }>();
 
 const loading = ref(true);
@@ -104,13 +105,13 @@ const handleToggleEpisode = async (episodeId: number, watched: boolean) => {
   }
 };
 
-const handleToggleSeason = async (seasonId: number, episodes: Episode[]) => {
+const handleToggleSeason = async (seasonId: number, episodes: Episode[], watched: boolean = true) => {
   togglingSeason.value = seasonId;
   try {
-    // Mark all unwatched episodes as watched
-    const unwatched = episodes.filter(ep => !ep.watched);
-    for (const ep of unwatched) {
-      await handleToggleEpisode(ep.id, true);
+    // Filter episodes that need to be changed
+    const targetEpisodes = episodes.filter(ep => ep.watched !== watched);
+    for (const ep of targetEpisodes) {
+      await handleToggleEpisode(ep.id, watched);
     }
   } finally {
     togglingSeason.value = null;
