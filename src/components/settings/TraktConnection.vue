@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { Loader2, Link2, Unlink, ExternalLink, CheckCircle2, AlertCircle } from 'lucide-vue-next';
+import { Loader2, Link2, Unlink, ExternalLink, CheckCircle2, AlertCircle, RefreshCw } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -9,16 +9,18 @@ interface TraktStatus {
     username?: string;
     userId?: string;
     connectedAt?: string;
+    lastSyncedAt?: string;
     expired?: boolean;
 }
 
 const loading = ref(true);
 const disconnecting = ref(false);
+const syncing = ref(false);
 const status = ref<TraktStatus | null>(null);
 const error = ref<string | null>(null);
 
 const fetchStatus = async () => {
-    loading.value = true;
+    if (!status.value) loading.value = true;
     error.value = null;
     try {
         const response = await fetch('/api/auth/trakt/status');
@@ -62,6 +64,25 @@ const disconnectTrakt = async () => {
         error.value = 'Failed to disconnect Trakt account';
     } finally {
         disconnecting.value = false;
+    }
+};
+
+const syncTrakt = async () => {
+    syncing.value = true;
+    error.value = null;
+    try {
+        const response = await fetch('/api/auth/trakt/sync', {
+            method: 'POST',
+        });
+        if (!response.ok) {
+            throw new Error('Sync failed');
+        }
+        await fetchStatus();
+    } catch (e) {
+        console.error('Error syncing Trakt:', e);
+        error.value = 'Failed to sync with Trakt';
+    } finally {
+        syncing.value = false;
     }
 };
 
@@ -122,7 +143,20 @@ onMounted(() => {
                                 <ExternalLink class="h-3 w-3" />
                             </a>
                         </p>
+                        <p v-if="status.lastSyncedAt" class="text-xs text-muted-foreground mt-1">
+                            Last synced: {{ new Date(status.lastSyncedAt).toLocaleString() }}
+                        </p>
                     </div>
+                    <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        @click="syncTrakt" 
+                        :disabled="syncing"
+                        title="Sync Now"
+                    >
+                        <Loader2 v-if="syncing" class="h-4 w-4 animate-spin" />
+                        <RefreshCw v-else class="h-4 w-4" />
+                    </Button>
                 </div>
 
                 <div v-if="status.expired" class="p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">

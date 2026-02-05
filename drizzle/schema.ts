@@ -198,6 +198,7 @@ export const accountConnections = pgTable('account_connections', {
     expiresAt: timestamp('expires_at'),
     providerUserId: text('provider_user_id'), // trakt user id
     providerUsername: text('provider_username'), // trakt username
+    lastSyncedAt: timestamp("last_synced_at"),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
 }, (t) => ({

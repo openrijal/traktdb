@@ -3,6 +3,7 @@ import { createDb } from '@/lib/db';
 import { episodeProgress, episodes, seasons, mediaItems } from 'drizzle/schema';
 import { eq, and, inArray } from 'drizzle-orm';
 import { createAuth } from '@/lib/auth';
+import { MediaType } from '@/lib/constants';
 
 export const POST: APIRoute = async ({ request, locals }) => {
     // @ts-ignore
@@ -55,6 +56,20 @@ export const POST: APIRoute = async ({ request, locals }) => {
                     target: [episodeProgress.userId, episodeProgress.episodeId],
                     set: { watched: markWatched, updatedAt: new Date() },
                 });
+        }
+
+        // Sync to Trakt
+        try {
+            const { createTrakt } = await import('@/lib/services/trakt-client');
+            const trakt = createTrakt(env, userId);
+            
+            await trakt.syncHistory(
+                { tmdbId: tvId, type: MediaType.TV, watchedAt: new Date() }, 
+                markWatched ? 'add' : 'remove'
+            );
+            
+        } catch (e) {
+            console.error('Trakt mark-all sync failed', e);
         }
 
         return new Response(JSON.stringify({
