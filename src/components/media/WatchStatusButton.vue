@@ -44,14 +44,14 @@ const toggleWatched = () => {
   <div class="flex items-center gap-2">
     <!-- Watchlist Button -->
     <Button @click.stop="toggleWatchlist" size="icon" variant="ghost" class="rounded-full transition-colors"
-      :class="isWatchlist ? 'bg-indigo-600 text-white hover:bg-indigo-700 hover:text-white' : 'bg-white/10 text-gray-300 hover:bg-white/20 hover:text-white'"
+      :class="isWatchlist ? 'bg-primary text-foreground hover:bg-primary/90 hover:text-foreground' : 'bg-white/10 text-secondary-foreground hover:bg-white/20 hover:text-foreground'"
       title="Watchlist">
       <Bookmark class="w-5 h-5" :class="{ 'fill-current': isWatchlist }" />
     </Button>
 
     <!-- Watched Button -->
     <Button @click.stop="toggleWatched" size="icon" variant="ghost" class="rounded-full transition-colors"
-      :class="isWatched ? 'bg-green-600 text-white hover:bg-green-700 hover:text-white' : 'bg-white/10 text-gray-300 hover:bg-white/20 hover:text-white'"
+      :class="isWatched ? 'bg-green-600 text-foreground hover:bg-green-700 hover:text-foreground' : 'bg-white/10 text-secondary-foreground hover:bg-white/20 hover:text-foreground'"
       title="Mark as Watched">
       <Check class="w-5 h-5" />
     </Button>
