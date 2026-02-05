@@ -35,7 +35,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
     }
 
     const trakt = createTrakt({
-      TRAKT_CLIENT_ID: connection.providerUserId || '',
+      TRAKT_CLIENT_ID: env.TRAKT_CLIENT_ID || '',
       TRAKT_ACCESS_TOKEN: connection.accessToken,
     });
 
