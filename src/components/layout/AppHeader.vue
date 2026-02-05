@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { UserCircle, Search as SearchIcon } from 'lucide-vue-next';
+import { UserCircle } from 'lucide-vue-next';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import GlobalSearch from '@/components/search/GlobalSearch.vue';
 
 const props = defineProps<{ user?: { name?: string | null; image?: string | null; email?: string; }; }>();
 </script>
@@ -11,9 +12,7 @@ const props = defineProps<{ user?: { name?: string | null; image?: string | null
             <!-- Spacer or Breadcrumbs could go here -->
         </div>
         <div class="flex items-center gap-4">
-            <a href="/search" class="text-muted-foreground hover:text-foreground transition-colors p-2 rounded-full hover:bg-muted">
-                <SearchIcon class="h-5 w-5" />
-            </a>
+            <GlobalSearch />
             <div class="flex items-center gap-2">
                 <span class="text-sm font-medium hidden md:block">{{ props.user?.name || 'User' }}</span>
                 <Avatar class="h-8 w-8 border border-primary/10">
