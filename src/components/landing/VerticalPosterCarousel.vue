@@ -39,7 +39,7 @@ const durationClass = {
             props.direction === 'down' ? 'direction-reverse' : ''
         )">
             <div v-for="(poster, i) in allPosters" :key="i"
-                class="w-full shrink-0 rounded-xl overflow-hidden shadow-lg aspect-[2/3]">
+                class="w-full shrink-0 rounded-xl overflow-hidden shadow-md aspect-[2/3]">
                 <img :src="poster" alt="Poster" class="w-full h-full object-cover" loading="lazy" />
             </div>
         </div>
