@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useLibraryStore } from '@/stores/library';
 import { Bookmark, Check, Loader2 } from 'lucide-vue-next';
 import { WatchStatus, MediaType } from '@/lib/constants';
@@ -8,9 +8,11 @@ import { Button } from '@/components/ui/button';
 const props = defineProps<{
   tmdbId: number;
   type: MediaType;
+  mediaItemId?: number;
 }>();
 
 const store = useLibraryStore();
+const markingAllEpisodes = ref(false);
 
 onMounted(() => {
   store.fetchStatus(props.tmdbId, props.type);
@@ -24,17 +26,48 @@ const isWatched = computed(() => status.value === WatchStatus.COMPLETED);
 
 const toggleWatchlist = () => {
   if (isWatchlist.value) {
-    store.updateStatus(props.tmdbId, props.type, null); // Remove
+    store.updateStatus(props.tmdbId, props.type, null);
   } else {
     store.updateStatus(props.tmdbId, props.type, WatchStatus.PLAN_TO_WATCH);
   }
 };
 
+const markAllEpisodesWatched = async () => {
+  if (props.type !== MediaType.TV) return;
+  
+  markingAllEpisodes.value = true;
+  try {
+    const response = await fetch('/api/library/mark-all-episodes', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        tvId: props.tmdbId,
+        markWatched: true,
+      }),
+    });
+
+    if (response.ok) {
+      // Update the TV series status to completed
+      store.updateStatus(props.tmdbId, props.type, WatchStatus.COMPLETED);
+    }
+  } catch (error) {
+    console.error('Failed to mark all episodes as watched:', error);
+  } finally {
+    markingAllEpisodes.value = false;
+  }
+};
+
 const toggleWatched = () => {
   if (isWatched.value) {
-    store.updateStatus(props.tmdbId, props.type, null); // Remove
+    store.updateStatus(props.tmdbId, props.type, null);
   } else {
-    store.updateStatus(props.tmdbId, props.type, WatchStatus.COMPLETED);
+    if (props.type === MediaType.TV) {
+      markAllEpisodesWatched();
+    } else {
+      store.updateStatus(props.tmdbId, props.type, WatchStatus.COMPLETED);
+    }
   }
 };
 
@@ -52,8 +85,10 @@ const toggleWatched = () => {
     <!-- Watched Button -->
     <Button @click.stop="toggleWatched" size="icon" variant="ghost" class="rounded-full transition-colors"
       :class="isWatched ? 'bg-green-600 text-foreground hover:bg-green-700 hover:text-foreground' : 'bg-white/10 text-secondary-foreground hover:bg-white/20 hover:text-foreground'"
+      :disabled="markingAllEpisodes"
       title="Mark as Watched">
-      <Check class="w-5 h-5" />
+      <Loader2 v-if="markingAllEpisodes" class="w-5 h-5 animate-spin" />
+      <Check v-else class="w-5 h-5" />
     </Button>
   </div>
 </template>

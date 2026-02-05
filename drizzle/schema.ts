@@ -203,3 +203,14 @@ export const accountConnections = pgTable('account_connections', {
 }, (t) => ({
     unq: uniqueIndex('account_connections_user_provider_unique').on(t.userId, t.provider),
 }));
+
+export const episodeProgress = pgTable('episode_progress', {
+    id: serial('id').primaryKey(),
+    userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+    episodeId: integer('episode_id').notNull().references(() => episodes.id, { onDelete: 'cascade' }),
+    watched: boolean('watched').default(false).notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}, (t) => ({
+    unq: uniqueIndex('episode_progress_user_episode_unique').on(t.userId, t.episodeId),
+}));

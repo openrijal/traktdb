@@ -1,7 +1,7 @@
 import type { Db } from '@/lib/db';
-import { mediaItems, seasons } from 'drizzle/schema';
-import { sql } from 'drizzle-orm';
-import type { TMDBMediaItem, TMDBSeason } from '@/lib/tmdb';
+import { mediaItems, seasons, episodes } from 'drizzle/schema';
+import { sql, eq } from 'drizzle-orm';
+import type { TMDBMediaItem, TMDBSeason, TMDBEpisode } from '@/lib/tmdb';
 import { MediaType } from '@/lib/constants';
 
 /**
@@ -73,6 +73,76 @@ export async function upsertSeasons(db: Db, seasonData: TMDBSeason[], mediaItemI
                 posterPath: sql.raw(`excluded.poster_path`),
                 episodeCount: sql.raw(`excluded.episode_count`),
                 voteAverage: sql.raw(`excluded.vote_average`),
+                updatedAt: new Date(),
+            }
+        });
+}
+
+/**
+ * Upserts a single season into the database.
+ * Returns the internal ID of the season.
+ */
+export async function upsertSeason(db: Db, season: TMDBSeason, mediaItemId: number): Promise<number | undefined> {
+    const values = {
+        tmdbId: season.id,
+        mediaItemId: mediaItemId,
+        seasonNumber: season.season_number,
+        name: season.name,
+        overview: season.overview,
+        posterPath: season.poster_path,
+        airDate: season.air_date || null,
+        episodeCount: season.episode_count,
+        voteAverage: season.vote_average ? Math.round(season.vote_average * 10) : 0,
+    };
+
+    const insertedIds = await db.insert(seasons)
+        .values(values)
+        .onConflictDoUpdate({
+            target: [seasons.tmdbId],
+            set: {
+                name: sql.raw(`excluded.name`),
+                overview: sql.raw(`excluded.overview`),
+                posterPath: sql.raw(`excluded.poster_path`),
+                episodeCount: sql.raw(`excluded.episode_count`),
+                voteAverage: sql.raw(`excluded.vote_average`),
+                updatedAt: new Date(),
+            }
+        })
+        .returning({ id: seasons.id });
+
+    return insertedIds[0]?.id;
+}
+
+/**
+ * Upserts a list of episodes for a season.
+ * Returns the internal IDs of the episodes.
+ */
+export async function upsertEpisodes(db: Db, episodeData: TMDBEpisode[], seasonId: number): Promise<void> {
+    if (episodeData.length === 0) return;
+
+    const values = episodeData.map(e => ({
+        tmdbId: e.id,
+        seasonId: seasonId,
+        episodeNumber: e.episode_number,
+        name: e.name,
+        overview: e.overview,
+        stillPath: e.still_path,
+        airDate: e.air_date || null,
+        voteAverage: e.vote_average ? Math.round(e.vote_average * 10) : 0,
+        voteCount: e.vote_count,
+    }));
+
+    await db.insert(episodes)
+        .values(values)
+        .onConflictDoUpdate({
+            target: [episodes.tmdbId],
+            set: {
+                name: sql.raw(`excluded.name`),
+                overview: sql.raw(`excluded.overview`),
+                stillPath: sql.raw(`excluded.still_path`),
+                airDate: sql.raw(`excluded.air_date`),
+                voteAverage: sql.raw(`excluded.vote_average`),
+                voteCount: sql.raw(`excluded.vote_count`),
                 updatedAt: new Date(),
             }
         });
