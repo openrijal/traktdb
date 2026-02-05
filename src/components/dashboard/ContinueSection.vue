@@ -21,8 +21,8 @@ const continueWatching = ref<any[]>([]);
 
                 <div class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/90 to-transparent">
                     <div class="text-sm font-medium text-white">Show Title</div>
-                    <div class="text-xs text-gray-300">S1 E{{ i }} • Episode Title</div>
-                    <div class="mt-2 h-1 w-full bg-gray-700 rounded-full overflow-hidden">
+                    <div class="text-xs text-muted-foreground">S1 E{{ i }} • Episode Title</div>
+                    <div class="mt-2 h-1 w-full bg-secondary rounded-full overflow-hidden">
                         <div class="h-full bg-primary w-[45%]"></div>
                     </div>
                 </div>

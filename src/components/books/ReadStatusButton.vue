@@ -52,21 +52,21 @@ const toggleCompleted = () => {
   <div class="flex items-center gap-1">
     <!-- Plan to Read -->
     <Button @click.stop="togglePlanToRead" size="icon" variant="ghost" class="rounded-full h-8 w-8 transition-colors"
-      :class="isPlanToRead ? 'bg-indigo-600 text-white hover:bg-indigo-700 hover:text-white' : 'bg-white/10 text-gray-300 hover:bg-white/20 hover:text-white'"
+      :class="isPlanToRead ? 'bg-primary text-foreground hover:bg-primary/90 hover:text-foreground' : 'bg-white/10 text-secondary-foreground hover:bg-white/20 hover:text-foreground'"
       title="Want to Read">
       <Bookmark class="w-4 h-4" :class="{ 'fill-current': isPlanToRead }" />
     </Button>
 
     <!-- Reading -->
     <Button @click.stop="toggleReading" size="icon" variant="ghost" class="rounded-full h-8 w-8 transition-colors"
-      :class="isReading ? 'bg-amber-600 text-white hover:bg-amber-700 hover:text-white' : 'bg-white/10 text-gray-300 hover:bg-white/20 hover:text-white'"
+      :class="isReading ? 'bg-amber-600 text-white hover:bg-amber-700 hover:text-white' : 'bg-white/10 text-secondary-foreground hover:bg-white/20 hover:text-foreground'"
       title="Reading">
       <BookOpen class="w-4 h-4" />
     </Button>
 
     <!-- Completed -->
     <Button @click.stop="toggleCompleted" size="icon" variant="ghost" class="rounded-full h-8 w-8 transition-colors"
-      :class="isCompleted ? 'bg-green-600 text-white hover:bg-green-700 hover:text-white' : 'bg-white/10 text-gray-300 hover:bg-white/20 hover:text-white'"
+      :class="isCompleted ? 'bg-green-600 text-white hover:bg-green-700 hover:text-white' : 'bg-white/10 text-secondary-foreground hover:bg-white/20 hover:text-foreground'"
       title="Read">
       <Check class="w-4 h-4" />
     </Button>

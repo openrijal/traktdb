@@ -42,7 +42,7 @@ function isActive(href: string) {
 </script>
 
 <template>
-    <div class="flex h-full w-64 flex-col border-r bg-card text-card-foreground">
+    <div class="flex h-full w-64 flex-col bg-card text-card-foreground">
         <div class="p-6">
             <a href="/dashboard" class="flex items-center gap-2 font-bold text-xl">
                 <span>Trackt<span class="text-primary">DB</span></span>
@@ -59,7 +59,7 @@ function isActive(href: string) {
             </a>
         </nav>
 
-        <div class="p-4 border-t">
+        <div class="p-4 mt-auto">
             <Button variant="ghost"
                 class="w-full justify-start gap-3 px-3 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
                 @click="handleSignOut">

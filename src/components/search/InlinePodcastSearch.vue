@@ -132,26 +132,26 @@ const getPodcastId = (podcast: any) => podcast.id || podcast.listenNotesId;
                 @keydown="handleKeydown"
                 @focus="query.length >= 2 && (isOpen = true)"
                 :placeholder="placeholder"
-                class="pl-9 pr-8 h-10 bg-gray-900/50 border-gray-800 rounded-lg focus-visible:ring-indigo-500/50"
+                class="pl-9 pr-8 h-10 bg-card/50 border-border rounded-lg focus-visible:ring-primary/50"
             />
             <button 
                 v-if="query" 
                 @click="clearSearch"
-                class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
             >
                 <X class="h-4 w-4" />
             </button>
             <div v-if="isLoading" class="absolute right-3 top-1/2 -translate-y-1/2">
-                <Loader2 class="h-4 w-4 animate-spin text-indigo-500" />
+                <Loader2 class="h-4 w-4 animate-spin text-primary" />
             </div>
         </div>
 
         <!-- Dropdown Results -->
         <div 
             v-if="isOpen && (results.length > 0 || isLoading)"
-            class="absolute top-full left-0 right-0 mt-1 bg-gray-900 border border-gray-800 rounded-lg shadow-xl z-50 overflow-hidden max-h-80 overflow-y-auto"
+            class="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-lg shadow-md z-50 overflow-hidden max-h-80 overflow-y-auto"
         >
-            <div v-if="isLoading && results.length === 0" class="p-4 text-center text-gray-400">
+            <div v-if="isLoading && results.length === 0" class="p-4 text-center text-muted-foreground">
                 <Loader2 class="h-5 w-5 animate-spin mx-auto" />
             </div>
             
@@ -160,11 +160,11 @@ const getPodcastId = (podcast: any) => podcast.id || podcast.listenNotesId;
                 :key="getPodcastId(item)"
                 @click="selectItem(item)"
                 :class="cn(
-                    'w-full flex items-center gap-3 p-3 text-left hover:bg-gray-800/50 transition-colors',
-                    selectedIndex === index && 'bg-gray-800/50'
+                    'w-full flex items-center gap-3 p-3 text-left hover:bg-secondary/50 transition-colors',
+                    selectedIndex === index && 'bg-secondary/50'
                 )"
             >
-                <div class="w-12 h-12 bg-gray-800 rounded-lg overflow-hidden flex-shrink-0">
+                <div class="w-12 h-12 bg-secondary rounded-lg overflow-hidden flex-shrink-0">
                     <img 
                         v-if="getArtwork(item)"
                         :src="getArtwork(item)!"
@@ -172,21 +172,21 @@ const getPodcastId = (podcast: any) => podcast.id || podcast.listenNotesId;
                         class="w-full h-full object-cover"
                     />
                     <div v-else class="w-full h-full flex items-center justify-center">
-                        <Headphones class="w-5 h-5 text-gray-600" />
+                        <Headphones class="w-5 h-5 text-muted-foreground" />
                     </div>
                 </div>
                 <div class="flex-1 min-w-0">
-                    <p class="font-medium text-white truncate">{{ item.title || item.collectionName }}</p>
-                    <p class="text-sm text-gray-400 truncate">{{ item.publisher || item.artistName }}</p>
+                    <p class="font-medium text-foreground truncate">{{ item.title || item.collectionName }}</p>
+                    <p class="text-sm text-muted-foreground truncate">{{ item.publisher || item.artistName }}</p>
                 </div>
-                <Plus class="w-4 h-4 text-indigo-400 flex-shrink-0" />
+                <Plus class="w-4 h-4 text-primary flex-shrink-0" />
             </button>
         </div>
 
         <!-- No Results -->
         <div 
             v-if="isOpen && !isLoading && query.length >= 2 && results.length === 0"
-            class="absolute top-full left-0 right-0 mt-1 bg-gray-900 border border-gray-800 rounded-lg shadow-xl z-50 p-4 text-center text-gray-400"
+            class="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-lg shadow-md z-50 p-4 text-center text-muted-foreground"
         >
             No podcasts found for "{{ query }}"
         </div>

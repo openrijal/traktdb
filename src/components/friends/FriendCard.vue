@@ -58,21 +58,21 @@ const handleRemove = async () => {
 </script>
 
 <template>
-    <div class="flex items-center justify-between p-4 bg-gray-900/50 rounded-xl border border-white/5 hover:border-white/10 transition-colors">
+    <div class="flex items-center justify-between p-4 bg-card/50 rounded-xl border border-white/5 hover:border-white/10 transition-colors">
         <div class="flex items-center gap-3">
             <Avatar class="h-10 w-10 border border-white/10">
                 <AvatarImage :src="user.image" :alt="user.name" />
-                <AvatarFallback class="bg-indigo-900 text-indigo-200">{{ initials }}</AvatarFallback>
+                <AvatarFallback class="bg-primary/20 text-primary">{{ initials }}</AvatarFallback>
             </Avatar>
             <div class="flex flex-col">
-                <span class="font-medium text-gray-200">{{ user.name }}</span>
+                <span class="font-medium text-secondary-foreground">{{ user.name }}</span>
                 <span v-if="status === 'friend'" class="text-xs text-green-400 flex items-center gap-1">
                     <UserCheck class="w-3 h-3" /> Friend
                 </span>
                 <span v-else-if="status === 'outgoing'" class="text-xs text-amber-400 flex items-center gap-1">
                     <Clock class="w-3 h-3" /> Request Sent
                 </span>
-                <span v-else-if="status === 'incoming'" class="text-xs text-indigo-400 flex items-center gap-1">
+                <span v-else-if="status === 'incoming'" class="text-xs text-primary flex items-center gap-1">
                     <UserPlus class="w-3 h-3" /> Request Received
                 </span>
             </div>
@@ -80,14 +80,14 @@ const handleRemove = async () => {
 
         <div class="flex gap-2">
             <template v-if="status === 'none'">
-                <Button size="sm" variant="default" @click="handleAdd" class="bg-indigo-600 hover:bg-indigo-700 text-white gap-2">
+                <Button size="sm" variant="default" @click="handleAdd" class="bg-primary hover:bg-primary/90 text-foreground gap-2">
                     <UserPlus class="w-4 h-4" />
                     Add
                 </Button>
             </template>
 
             <template v-else-if="status === 'incoming'">
-                <Button size="sm" variant="default" @click="handleAccept" class="bg-green-600 hover:bg-green-700 text-white gap-2">
+                <Button size="sm" variant="default" @click="handleAccept" class="bg-green-600 hover:bg-green-700 text-foreground gap-2">
                     <UserCheck class="w-4 h-4" />
                     Accept
                 </Button>
@@ -97,7 +97,7 @@ const handleRemove = async () => {
             </template>
 
             <template v-else-if="status === 'outgoing'">
-                <Button size="sm" variant="ghost" @click="handleRemove" class="text-gray-400 hover:text-white hover:bg-white/10">
+                <Button size="sm" variant="ghost" @click="handleRemove" class="text-muted-foreground hover:text-foreground hover:bg-white/10">
                     Cancel
                 </Button>
             </template>

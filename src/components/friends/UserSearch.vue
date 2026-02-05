@@ -26,19 +26,19 @@ watch(searchQuery, (newVal) => {
 <template>
     <div class="space-y-6">
         <div class="relative">
-            <Search class="absolute left-3 top-3 h-4 w-4 text-gray-500" />
+            <Search class="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input 
                 v-model="searchQuery"
                 placeholder="Search users by name or email (min 3 chars)..." 
-                class="pl-10 bg-gray-900 border-gray-800 focus:border-indigo-500/50"
+                class="pl-10 bg-card border-border focus:border-primary/50"
             />
             <div v-if="store.isSearching" class="absolute right-3 top-3">
-                <Loader2 class="h-4 w-4 animate-spin text-indigo-500" />
+                <Loader2 class="h-4 w-4 animate-spin text-primary" />
             </div>
         </div>
 
         <div v-if="searchQuery.length >= 3" class="space-y-4">
-            <h3 class="text-sm font-medium text-gray-400">Search Results</h3>
+            <h3 class="text-sm font-medium text-muted-foreground">Search Results</h3>
             
             <div v-if="store.searchResults.length > 0" class="grid gap-3">
                 <FriendCard 
@@ -47,12 +47,12 @@ watch(searchQuery, (newVal) => {
                     :user="user" 
                 />
             </div>
-            <div v-else-if="!store.isSearching" class="text-center py-8 text-gray-500">
+            <div v-else-if="!store.isSearching" class="text-center py-8 text-muted-foreground">
                 No users found matching "{{ searchQuery }}"
             </div>
         </div>
         
-        <div v-else class="text-center py-12 text-gray-500 bg-gray-900/20 rounded-xl border border-dashed border-white/5">
+        <div v-else class="text-center py-12 text-muted-foreground bg-card/20 rounded-xl border border-dashed border-white/5">
             <Search class="w-12 h-12 mx-auto mb-3 opacity-20" />
             <p>Type at least 3 characters to search for users.</p>
         </div>

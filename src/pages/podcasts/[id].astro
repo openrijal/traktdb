@@ -29,17 +29,17 @@ try {
 ---
 
 <AppLayout>
-    <main class="min-h-screen bg-gray-950 text-gray-100 pb-20">
+    <main class="min-h-screen pb-20">
         {
             error ? (
                 <div class="max-w-7xl mx-auto px-4 py-20 text-center">
-                    <h1 class="text-2xl font-bold text-red-500 mb-4">
+                    <h1 class="text-2xl font-bold text-destructive mb-4">
                         Error Loading Podcast
                     </h1>
-                    <p class="text-gray-400">{error}</p>
+                    <p class="text-muted-foreground">{error}</p>
                     <a
                         href="/library?type=podcast"
-                        class="mt-8 inline-block text-indigo-400 hover:text-indigo-300"
+                        class="mt-8 inline-block text-primary hover:text-primary/80"
                     >
                         Back to Library
                     </a>
@@ -52,14 +52,14 @@ try {
                         {podcast.description && (
                             <div class="prose prose-invert max-w-none">
                                 <h2 class="text-xl font-semibold mb-4">About</h2>
-                                <p class="text-gray-300 leading-relaxed">{podcast.description}</p>
+                                <p class="text-muted-foreground leading-relaxed">{podcast.description}</p>
                             </div>
                         )}
                     </div>
                 </>
             ) : (
                 <div class="flex items-center justify-center min-h-[50vh]">
-                    <div class="animate-pulse text-gray-500">Loading...</div>
+                    <div class="animate-pulse text-muted-foreground">Loading...</div>
                 </div>
             )
         }

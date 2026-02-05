@@ -80,14 +80,14 @@ const toggleMenu = () => {
         
         <div 
             v-if="isOpen"
-            class="absolute top-full left-0 mt-2 w-48 bg-gray-900 border border-gray-800 rounded-lg shadow-xl z-50 overflow-hidden"
+            class="absolute top-full left-0 mt-2 w-48 bg-card border border-border rounded-lg shadow-md z-50 overflow-hidden"
         >
             <button
                 v-for="option in statusOptions"
                 :key="option.value"
                 @click="handleStatusChange(option.value)"
-                class="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-left hover:bg-gray-800 transition-colors"
-                :class="{ 'bg-gray-800 text-indigo-400': currentStatus === option.value }"
+                class="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-left hover:bg-secondary transition-colors"
+                :class="{ 'bg-secondary text-primary': currentStatus === option.value }"
             >
                 <component :is="option.icon" class="w-4 h-4" />
                 {{ option.label }}
@@ -95,7 +95,7 @@ const toggleMenu = () => {
             <button
                 v-if="currentStatus"
                 @click="handleStatusChange(null)"
-                class="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-left text-red-400 hover:bg-gray-800 transition-colors border-t border-gray-800"
+                class="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-left text-red-400 hover:bg-secondary transition-colors border-t border-border"
             >
                 <X class="w-4 h-4" />
                 Remove from Library

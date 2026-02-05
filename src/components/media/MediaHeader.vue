@@ -51,10 +51,10 @@ const formatStatus = (s?: string) => s || 'Unknown';
         <div class="absolute inset-0 z-0">
             <template v-if="backdropUrl">
                 <img :src="backdropUrl" :alt="title" class="w-full h-full object-cover" />
-                <div class="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-950/60 to-transparent"></div>
-                <div class="absolute inset-0 bg-gradient-to-r from-gray-950 via-gray-950/40 to-transparent"></div>
+                <div class="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent"></div>
+                <div class="absolute inset-0 bg-gradient-to-r from-background via-background/40 to-transparent"></div>
             </template>
-            <div v-else class="w-full h-full bg-gray-900 border-b border-white/5"></div>
+            <div v-else class="w-full h-full bg-card border-b border-white/5"></div>
         </div>
 
         <!-- Content Container -->
@@ -63,14 +63,14 @@ const formatStatus = (s?: string) => s || 'Unknown';
 
             <!-- Poster (Hidden on mobile? No, visible but smaller) -->
             <div
-                class="hidden md:block w-64 rounded-xl overflow-hidden shadow-2xl border-4 border-white/5 rotate-2 shrink-0">
+                class="hidden md:block w-64 rounded-xl overflow-hidden shadow-md border-4 border-white/5 rotate-2 shrink-0">
                 <img :src="posterUrl" :alt="title" class="w-full h-auto" />
             </div>
 
             <!-- Text Content -->
-            <div class="flex-1 space-y-4 text-white">
-                <div class="flex items-center gap-2 text-sm font-medium text-indigo-400 uppercase tracking-wider">
-                    <span class="border border-indigo-500/30 px-2 py-0.5 rounded">
+            <div class="flex-1 space-y-4 text-foreground">
+                <div class="flex items-center gap-2 text-sm font-medium text-primary uppercase tracking-wider">
+                    <span class="border border-primary/30 px-2 py-0.5 rounded">
                         {{ props.media.type === MediaType.TV ? 'TV Series' : 'Movie' }}
                     </span>
                     <span>&bull;</span>
@@ -78,19 +78,19 @@ const formatStatus = (s?: string) => s || 'Unknown';
                 </div>
 
                 <h1
-                    class="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight leading-none text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400">
-                    {{ title }} <span class="text-2xl md:text-3xl text-gray-500 font-normal">({{ year }})</span>
+                    class="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight leading-none text-transparent bg-clip-text bg-gradient-to-r from-foreground to-muted-foreground">
+                    {{ title }} <span class="text-2xl md:text-3xl text-muted-foreground font-normal">({{ year }})</span>
                 </h1>
 
-                <div class="flex items-center gap-6 text-sm text-gray-300">
+                <div class="flex items-center gap-6 text-sm text-secondary-foreground">
                     <div class="flex items-center gap-1.5">
                         <Star class="w-5 h-5 text-amber-500 fill-current" />
-                        <span class="text-white font-bold text-lg">{{ rating }}</span>
+                        <span class="text-foreground font-bold text-lg">{{ rating }}</span>
                         <span>/ 10</span>
                     </div>
                     <div class="flex items-center gap-1.5"
                         v-if="props.media.release_date || props.media.first_air_date">
-                        <Calendar class="w-4 h-4 text-gray-400" />
+                        <Calendar class="w-4 h-4 text-muted-foreground" />
                         <span>{{ props.media.release_date || props.media.first_air_date }}</span>
                     </div>
                 </div>
@@ -101,7 +101,7 @@ const formatStatus = (s?: string) => s || 'Unknown';
                 </div>
 
                 <div v-if="props.media.overview" class="max-w-3xl">
-                    <p class="text-lg text-gray-300 leading-relaxed font-light">{{ props.media.overview }}</p>
+                    <p class="text-lg text-secondary-foreground leading-relaxed font-light">{{ props.media.overview }}</p>
                 </div>
             </div>
         </div>
