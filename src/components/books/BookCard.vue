@@ -45,7 +45,7 @@ const rating = computed(() => props.book.volumeInfo.averageRating ? props.book.v
     <!-- Link to book detail page (TODO) -->
     <div class="group block relative">
         <Card
-            class="overflow-hidden border-0 bg-gray-900 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl h-full">
+            class="overflow-hidden border-0 bg-card shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-lg h-full">
 
             <!-- Image Container with Aspect Ratio -->
             <div class="aspect-[2/3] w-full relative overflow-hidden">
@@ -78,11 +78,11 @@ const rating = computed(() => props.book.volumeInfo.averageRating ? props.book.v
 
             <!-- Content -->
             <CardContent class="p-3">
-                <h3 class="font-semibold text-gray-100 line-clamp-1 group-hover:text-indigo-400 transition-colors" :title="props.book.volumeInfo.title">
+                <h3 class="font-semibold text-foreground line-clamp-1 group-hover:text-primary transition-colors" :title="props.book.volumeInfo.title">
                     {{ props.book.volumeInfo.title }}
                 </h3>
-                <div class="flex flex-col gap-0.5 mt-1 text-xs text-gray-400">
-                    <span class="line-clamp-1 text-gray-300" :title="authors">{{ authors }}</span>
+                <div class="flex flex-col gap-0.5 mt-1 text-xs text-muted-foreground">
+                    <span class="line-clamp-1 text-secondary-foreground" :title="authors">{{ authors }}</span>
                     <span>{{ year }}</span>
                 </div>
             </CardContent>
