@@ -23,6 +23,9 @@ pnpm-debug.log*
 # ide setting folder
 .idea/
 .vscode/
+.gemini/
+.opencode/
+.specify/
 
 # deployment related
 .wrangler/

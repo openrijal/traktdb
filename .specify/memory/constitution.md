@@ -1,106 +1,43 @@
-# TraktDB Constitution
-
-<!-- Sync Impact Report
-Version change: 1.0.0 → 1.1.0 (Updated to reflect actual implementation)
-Modified: Technology Stack section to match real implementation
-- Changed from Supabase to Neon PostgreSQL
-- Changed from Supabase Auth to BetterAuth with Google OAuth
-- Added Friends feature to scope
-Templates requiring updates: ✅ Updated
--->
+# Traktdb Constitution
+<!-- Defines the immutable core principles and governance for the Traktdb project. -->
 
 ## Core Principles
 
-### I. Component-First Architecture
-Every UI feature MUST be built as a reusable Vue component before integration into pages. Components MUST be independently testable. Shared components live in `src/components/` using ShadCN-Vue patterns.
+### I. Verification-First (The "Done" Standard)
+<!-- "Done" means Verified. No code is complete until it is proven to work. -->
+All changes must be verified. This means unit tests for logic/utils, and manual verification steps (documented in `walkthrough.md`) for UI/Integration. We do not assume code works; we prove it. If a test cannot be written, the manual verification plan must be explicit and rigorous.
 
-**Rationale**: Astro + Vue architecture demands clear component boundaries. Reusable components accelerate development and ensure visual consistency across web and mobile via Capacitor.
+### II. Spec-Driven Development (Think Before Acting)
+<!-- Perceive -> Reason -> Act -> Refine. -->
+We never rush into implementation. We always start with a clear understanding of the requirements (Specifications) and a solid plan (`implementation_plan.md`). Ambiguities are resolved *before* writing code. We adhere to the PRAR cycle (Perceive, Reason, Act, Refine) defined in `GEMINI.md`.
 
-### II. API-First Design
-All external integrations (TMDB, Google Books, iTunes/Podcasts) MUST be abstracted behind a service layer in `src/lib/`. Direct API calls from components are forbidden. Each service MUST define TypeScript interfaces for request/response contracts.
+### III. Aesthetic & UX Excellence
+<!-- "Deep Dark Blue" / "Gunmetal" Theme is Law. -->
+Traktdb is a premium personal media application. The user interface must be polished, responsive, and visually stunning. We strictly adhere to the defined Design System (Tailwind v4, Shadcn/Vue patterns, defined color palette). "Good enough" UI is not acceptable; it must be delightful.
 
-**Rationale**: Media APIs have rate limits, varying schemas, and may change. Abstraction enables caching, fallbacks, and future provider swaps without UI changes.
+### IV. Architecture & Type Safety
+<!-- Strict TypeScript. Clean Separation of Concerns. -->
+We maintain a strict TypeScript environment to catch errors early. We separate concerns: logic goes in services/utils, data access in strict Drizzle/SQL layers, and presentation in Vue components. We avoid "magic strings" in favor of centralized Enums and Constants.
 
-### III. Database-Backed State
-User data (watchlists, progress, ratings) MUST be stored in PostgreSQL via DrizzleORM. Pinia stores are for UI state and caching only, not as source of truth. Database is the single source of truth.
+### V. User Partnership & Transparency
+<!-- We work *with* the user, not just for them. -->
+We explain our thought process. We acknowledge mistakes immediately and correct them. We update documentation (`task.md`, `README.md`, `GEMINI.md`) to reflect the current reality of the codebase. We seek user approval for significant architectural changes.
 
-**Rationale**: Server-side persistence enables multi-device sync and prevents data loss.
+## Technology Guidelines
+<!-- The immutable tech stack constraints. -->
 
-### IV. Test Coverage Requirements
-- Unit tests MUST cover all service layer functions
-- Integration tests MUST verify auth flows and database operations
-- E2E tests MUST cover critical user journeys: search, add to library, track progress
-- Run `npm test` before committing
-
-**Rationale**: Media tracking involves complex state (episodes, progress, ratings). Tests prevent regressions.
-
-### V. Cross-Platform Parity
-Features MUST work identically on web and mobile (iOS/Android via Capacitor). Platform-specific code MUST be isolated in Capacitor plugins. UI MUST be responsive-first.
-
-**Rationale**: Users expect seamless experience across devices.
-
-### VI. Data Privacy & User Control
-User data MUST never be shared with third parties. Authentication via Google OAuth only - no password storage.
-
-**Rationale**: Media consumption is personal. Trust is foundational.
-
-## Technology Stack
-
-**Implemented stack (non-negotiable):**
-- **Framework**: Astro 5.x with Vue 3 integration
-- **Database**: DrizzleORM with Neon PostgreSQL (serverless)
-- **Auth**: BetterAuth with Google OAuth
-- **Mobile**: Capacitor 8.x for iOS/Android
-- **Deployment**: Cloudflare Pages (via wrangler)
-- **APIs**: 
-  - TMDB (movies/TV)
-  - Google Books API (books)
-  - iTunes Search API (podcasts)
-
-**Styling**: Tailwind CSS v4 with ShadCN-Vue components
-**State**: Pinia with persisted state plugin
-**Testing**: Vitest with happy-dom
-
-## Features Scope
-
-### Implemented (Closed)
-- ✅ Project setup & infrastructure (#1)
-- ✅ Authentication with Google OAuth (#2)
-- ✅ Core database & API layer (#3)
-- ✅ Media management UI basics (#4)
-- ✅ Design system with ShadCN (#10)
-
-### In Progress (Open)
-- 🔄 Rating & Progress System (#5)
-- 🔄 Calendar & Scheduling (#6)
-- 🔄 Watch Providers & Platforms (#7)
-- 🔄 Books, Audiobooks & Podcasts (#8)
-- 🔄 Mobile App Development (#9)
-- 🔄 Production Readiness (#10)
-
-### Future (Not Started)
-- Friends & Social features
-- Collections for movie franchises
-- Multi-region watch provider support
-
-## Development Workflow
-
-1. **Feature Specification**: Reference specs in `/specs/<feature>/spec.md`
-2. **Task Breakdown**: Epics and tasks tracked via GitHub Issues
-3. **Branch Strategy**: `main` (production), feature branches for work
-4. **PR Requirements**: 
-   - Linked to GitHub issue
-   - Passing CI (tests, lint, type-check)
-   - Migration files included if schema changes
-5. **Database Changes**: Always generate and commit migrations
+*   **Framework**: Astro (Hybrid Rendering)
+*   **UI Components**: Vue.js + Shadcn/Vue
+*   **Styling**: Tailwind CSS v4 (Custom "Gunmetal" Theme)
+*   **Database**: PostgreSQL + Drizzle ORM
+*   **Deployment**: Cloudflare Workers / Pages
+*   **Language**: TypeScript (Strict)
 
 ## Governance
+<!-- How we work and how this document changes. -->
 
-This constitution supersedes all ad-hoc decisions. Amendments require:
-1. Written proposal with rationale
-2. Update to this document with version bump
-3. Commit with clear message
+1.  **Supremacy**: This Constitution and the `GEMINI.md` file are the supreme laws of the project. In case of conflict, `GEMINI.md` (Project Context) takes precedence for project-specific details, while this Constitution holds for general operating principles.
+2.  **Amendments**: Changes to this Constitution require explicit User approval.
+3.  **Documentation**: Every significant feature or refactor must verify that it leaves the documentation better than it found it.
 
-All code reviews MUST verify compliance with these principles.
-
-**Version**: 1.1.0 | **Ratified**: 2026-01-31 | **Last Amended**: 2026-01-31
+**Version**: 1.0.0 | **Ratified**: 2026-02-04 | **Last Amended**: 2026-02-04
