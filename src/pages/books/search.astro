@@ -30,10 +30,10 @@ if (q) {
 ---
 
 <AppLayout>
-    <main class="min-h-screen bg-gray-950 text-white pb-20">
+    <main class="min-h-screen pb-20">
         <!-- Search Header -->
         <div
-            class="sticky top-0 z-40 bg-gray-950/80 backdrop-blur-md border-b border-white/10"
+            class="sticky top-0 z-40 bg-background/80 backdrop-blur-md border-b border-border"
         >
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                 <form action="/books/search" method="GET" class="relative group">
@@ -41,7 +41,7 @@ if (q) {
                         class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"
                     >
                         <SearchIcon
-                            class="h-5 w-5 text-gray-400 group-focus-within:text-indigo-400 transition-colors"
+                            class="h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors"
                         />
                     </div>
                     <Input
@@ -49,7 +49,7 @@ if (q) {
                         name="q"
                         value={q}
                         placeholder="Search books..."
-                        class="block w-full pl-11 pr-4 py-3 bg-gray-900 border border-transparent rounded-xl leading-5 text-gray-100 placeholder-gray-500 focus:outline-none focus:bg-gray-800 focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 sm:text-sm transition-all shadow-lg h-12"
+                        class="block w-full pl-11 pr-4 py-3 bg-card border border-transparent rounded-xl leading-5 text-foreground placeholder-muted-foreground focus:outline-none focus:bg-secondary focus:border-primary/50 focus:ring-1 focus:ring-primary/50 sm:text-sm transition-all shadow-md h-12"
                         autofocus
                     />
                 </form>
@@ -60,7 +60,7 @@ if (q) {
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             {
                 q && (
-                    <h2 class="text-xl font-semibold text-gray-400 mb-6">
+                    <h2 class="text-xl font-semibold text-muted-foreground mb-6">
                         {results.length > 0
                             ? `Found ${results.length} results for "${q}"`
                             : `No results found for "${q}"`}
@@ -70,7 +70,7 @@ if (q) {
 
             {
                 error && (
-                    <div class="p-4 bg-red-900/20 border border-red-500/50 rounded-lg text-red-200">
+                    <div class="p-4 bg-destructive/20 border border-destructive/50 rounded-lg text-destructive">
                         {error}
                     </div>
                 )
@@ -89,7 +89,7 @@ if (q) {
 
             {
                 !q && (
-                    <div class="flex flex-col items-center justify-center py-20 text-gray-500">
+                    <div class="flex flex-col items-center justify-center py-20 text-muted-foreground">
                         <SearchIcon class="w-16 h-16 mb-4 opacity-20" />
                         <p class="text-lg">
                             Search for books to add to your library.
