@@ -108,6 +108,13 @@ export class TraktClient {
         };
         return this.request(endpoint, 'POST', payload);
     }
+    async getCalendarShows(startDate: string, days: number) {
+        return this.request(`/calendars/my/shows/${startDate}/${days}`);
+    }
+
+    async getCalendarMovies(startDate: string, days: number) {
+        return this.request(`/calendars/my/movies/${startDate}/${days}`);
+    }
 }
 
 export const createTrakt = (env: any, userId: string) => new TraktClient(env, userId);
