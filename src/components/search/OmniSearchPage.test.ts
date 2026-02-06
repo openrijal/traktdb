@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import OmniSearchPage from './OmniSearchPage.vue';
+import { getTestHost } from '@/lib/test-utils';
 
 // Mock @vueuse/core
 vi.mock('@vueuse/core', () => ({
@@ -43,10 +44,10 @@ describe('OmniSearchPage', () => {
         vi.clearAllMocks();
         // Reset location
         Object.defineProperty(window, 'location', {
-            value: { search: '', href: 'http://localhost/search' },
+            value: { search: '', href: `${getTestHost()}/search` },
             writable: true,
         });
-        vi.spyOn(window.history, 'replaceState').mockImplementation(() => {});
+        vi.spyOn(window.history, 'replaceState').mockImplementation(() => { });
     });
 
     it('renders search input and empty state', () => {
@@ -109,7 +110,7 @@ describe('OmniSearchPage', () => {
 
     it('reads query from URL on mount', async () => {
         Object.defineProperty(window, 'location', {
-            value: { search: '?q=batman&tab=movies', href: 'http://localhost/search?q=batman&tab=movies' },
+            value: { search: '?q=batman&tab=movies', href: `${getTestHost()}/search?q=batman&tab=movies` },
             writable: true,
         });
 

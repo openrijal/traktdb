@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import LibraryPage from './LibraryPage.vue';
 import { MediaType } from '@/lib/constants';
+import { getTestHost } from '@/lib/test-utils';
 
 // Mock child components
 vi.mock('@/components/media/MediaCard.vue', () => ({
@@ -34,10 +35,10 @@ describe('LibraryPage', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         Object.defineProperty(window, 'location', {
-            value: { search: '', href: 'http://localhost/library' },
+            value: { search: '', href: `${getTestHost()}/library` },
             writable: true,
         });
-        vi.spyOn(window.history, 'replaceState').mockImplementation(() => {});
+        vi.spyOn(window.history, 'replaceState').mockImplementation(() => { });
     });
 
     it('renders media type tabs', () => {
@@ -123,7 +124,7 @@ describe('LibraryPage', () => {
 
     it('reads type/status from URL params on mount', async () => {
         Object.defineProperty(window, 'location', {
-            value: { search: '?type=book&status=reading', href: 'http://localhost/library?type=book&status=reading' },
+            value: { search: '?type=book&status=reading', href: `${getTestHost()}/library?type=book&status=reading` },
             writable: true,
         });
 
