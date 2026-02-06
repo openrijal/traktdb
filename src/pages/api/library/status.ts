@@ -75,7 +75,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
     }
 
     // CSRF Protection: Require X-Requested-With header
-    // This is a standard defense for REST APIs consumed by browsers.
     const requestedWith = request.headers.get('x-requested-with');
 
     if (requestedWith !== 'XMLHttpRequest') {
@@ -113,7 +112,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
                 }
                 mediaItemId = newId;
             }
-
         }
         if (!mediaItemId && type === MediaType.MOVIE) {
             mediaItemId = await upsertMediaItem(db, tmdbItem, type);
@@ -144,7 +142,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
             if (status === WatchStatus.COMPLETED) {
                 await bulkUpdateEpisodeStatus(db, session.user.id, mediaItemId, true, env);
             } else if (status === WatchStatus.PLAN_TO_WATCH) {
-                // Reset progress if moving back to plan to watch (as requested: "implies I wanna remove that status... and all episodes should be marked as unwatched")
                 await bulkUpdateEpisodeStatus(db, session.user.id, mediaItemId, false, env);
             }
         }
@@ -154,7 +151,9 @@ export const POST: APIRoute = async ({ request, locals }) => {
             const trakt = createTrakt(env, session.user.id);
             if (status === WatchStatus.COMPLETED) {
                 await trakt.syncHistory({ tmdbId, type, watchedAt: new Date() }, 'add');
+                await trakt.syncWatchlist({ tmdbId, type }, 'remove');
             } else if (status === WatchStatus.PLAN_TO_WATCH) {
+                await trakt.syncWatchlist({ tmdbId, type }, 'add');
                 await trakt.syncHistory({ tmdbId, type }, 'remove');
             }
         } catch (e) {

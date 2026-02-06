@@ -1,6 +1,6 @@
-
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { POST } from './mark-all-episodes';
+import { createTestRequest } from '@/lib/test-utils';
 
 // Mocks
 const mockSession = {
@@ -59,12 +59,11 @@ describe('API: /api/library/mark-all-episodes', () => {
 
     describe('POST', () => {
         it('should return 401 if not authenticated', async () => {
-            (createAuth() as any).api.getSession.mockResolvedValue(null);
+            (createAuth({} as any) as any).api.getSession.mockResolvedValue(null);
 
-            const req = new Request('http://localhost/api/library/mark-all-episodes', {
+            const req = createTestRequest('/api/library/mark-all-episodes', {
                 method: 'POST',
-                body: JSON.stringify({ tvId: 1396, markWatched: true }),
-                headers: { 'Content-Type': 'application/json' }
+                body: { tvId: 1396, markWatched: true }
             });
             const res = await POST({ request: req, locals: {} } as any);
 
@@ -72,12 +71,11 @@ describe('API: /api/library/mark-all-episodes', () => {
         });
 
         it('should return 400 if tvId is missing', async () => {
-            (createAuth() as any).api.getSession.mockResolvedValue(mockSession);
+            (createAuth({} as any) as any).api.getSession.mockResolvedValue(mockSession);
 
-            const req = new Request('http://localhost/api/library/mark-all-episodes', {
+            const req = createTestRequest('/api/library/mark-all-episodes', {
                 method: 'POST',
-                body: JSON.stringify({ markWatched: true }),
-                headers: { 'Content-Type': 'application/json' }
+                body: { markWatched: true }
             });
             const res = await POST({ request: req, locals: {} } as any);
 
@@ -87,13 +85,12 @@ describe('API: /api/library/mark-all-episodes', () => {
         });
 
         it('should return success with count 0 if no episodes exist', async () => {
-            (createAuth() as any).api.getSession.mockResolvedValue(mockSession);
+            (createAuth({} as any) as any).api.getSession.mockResolvedValue(mockSession);
             mockDb.where.mockReturnValueOnce([]);
 
-            const req = new Request('http://localhost/api/library/mark-all-episodes', {
+            const req = createTestRequest('/api/library/mark-all-episodes', {
                 method: 'POST',
-                body: JSON.stringify({ tvId: 999999, markWatched: true }),
-                headers: { 'Content-Type': 'application/json' }
+                body: { tvId: 999999, markWatched: true }
             });
             const res = await POST({ request: req, locals: {} } as any);
 
@@ -104,17 +101,16 @@ describe('API: /api/library/mark-all-episodes', () => {
         });
 
         it('should mark all episodes as watched', async () => {
-            (createAuth() as any).api.getSession.mockResolvedValue(mockSession);
+            (createAuth({} as any) as any).api.getSession.mockResolvedValue(mockSession);
             mockDb.where.mockResolvedValueOnce([
                 { id: 1 },
                 { id: 2 },
                 { id: 3 }
             ]);
 
-            const req = new Request('http://localhost/api/library/mark-all-episodes', {
+            const req = createTestRequest('/api/library/mark-all-episodes', {
                 method: 'POST',
-                body: JSON.stringify({ tvId: 1396, markWatched: true }),
-                headers: { 'Content-Type': 'application/json' }
+                body: { tvId: 1396, markWatched: true }
             });
             const res = await POST({ request: req, locals: {} } as any);
 
@@ -128,16 +124,15 @@ describe('API: /api/library/mark-all-episodes', () => {
         });
 
         it('should mark all episodes as unwatched when markWatched is false', async () => {
-            (createAuth() as any).api.getSession.mockResolvedValue(mockSession);
+            (createAuth({} as any) as any).api.getSession.mockResolvedValue(mockSession);
             mockDb.where.mockResolvedValueOnce([
                 { id: 1 },
                 { id: 2 }
             ]);
 
-            const req = new Request('http://localhost/api/library/mark-all-episodes', {
+            const req = createTestRequest('/api/library/mark-all-episodes', {
                 method: 'POST',
-                body: JSON.stringify({ tvId: 1396, markWatched: false }),
-                headers: { 'Content-Type': 'application/json' }
+                body: { tvId: 1396, markWatched: false }
             });
             const res = await POST({ request: req, locals: {} } as any);
 
@@ -149,13 +144,12 @@ describe('API: /api/library/mark-all-episodes', () => {
         });
 
         it('should default markWatched to true if not provided', async () => {
-            (createAuth() as any).api.getSession.mockResolvedValue(mockSession);
+            (createAuth({} as any) as any).api.getSession.mockResolvedValue(mockSession);
             mockDb.where.mockResolvedValueOnce([{ id: 1 }]);
 
-            const req = new Request('http://localhost/api/library/mark-all-episodes', {
+            const req = createTestRequest('/api/library/mark-all-episodes', {
                 method: 'POST',
-                body: JSON.stringify({ tvId: 1396 }),
-                headers: { 'Content-Type': 'application/json' }
+                body: { tvId: 1396 }
             });
             const res = await POST({ request: req, locals: {} } as any);
 

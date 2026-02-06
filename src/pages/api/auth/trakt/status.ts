@@ -20,6 +20,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
             providerUserId: accountConnections.providerUserId,
             expiresAt: accountConnections.expiresAt,
             createdAt: accountConnections.createdAt,
+            lastSyncedAt: accountConnections.lastSyncedAt,
         })
             .from(accountConnections)
             .where(and(
@@ -42,6 +43,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
             username: conn.providerUsername,
             userId: conn.providerUserId,
             connectedAt: conn.createdAt,
+            lastSyncedAt: conn.lastSyncedAt,
             expired: isExpired,
         }), { status: 200 });
     } catch (error) {

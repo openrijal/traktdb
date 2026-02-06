@@ -52,28 +52,36 @@ export class TraktClient {
             return null;
         }
 
-        return response.json(); // Trakt usually returns JSON, even for empty success, or handle status 204
+        return response.json();
     }
 
     async syncHistory(media: { tmdbId: number, type: MediaType, watchedAt?: Date }, action: 'add' | 'remove') {
         const endpoint = action === 'add' ? '/sync/history' : '/sync/history/remove';
-
-        // Trakt expects specific payload structure
         const payload: any = {};
 
-        // Note: Trakt uses 'movies' and 'shows'/'episodes'.
-        // For simple movie/show sync:
         if (media.type === MediaType.MOVIE) {
             payload.movies = [{
                 ids: { tmdb: media.tmdbId },
                 watched_at: media.watchedAt?.toISOString(),
             }];
         } else if (media.type === MediaType.TV) {
-            // Syncing a whole show?
             payload.shows = [{
                 ids: { tmdb: media.tmdbId },
                 watched_at: media.watchedAt?.toISOString(),
             }];
+        }
+
+        return this.request(endpoint, 'POST', payload);
+    }
+
+    async syncWatchlist(media: { tmdbId: number, type: MediaType }, action: 'add' | 'remove') {
+        const endpoint = action === 'add' ? '/sync/watchlist' : '/sync/watchlist/remove';
+        const payload: any = {};
+
+        if (media.type === MediaType.MOVIE) {
+            payload.movies = [{ ids: { tmdb: media.tmdbId } }];
+        } else if (media.type === MediaType.TV) {
+            payload.shows = [{ ids: { tmdb: media.tmdbId } }];
         }
 
         return this.request(endpoint, 'POST', payload);
@@ -91,14 +99,6 @@ export class TraktClient {
     }
 
     async syncSeason(season: { tmdbId: number, watchedAt?: Date }, action: 'add' | 'remove') {
-        // Trakt doesn't strictly have a "sync season" endpoint that takes a season TMDB ID for history directly 
-        // usually you send episodes, BUT you can send 'seasons' in the payload if you have the show, 
-        // or just lists of episodes.
-        // Simplest is to map to episodes if possible, otherwise rely on show sync?
-        // Actually /sync/history allows 'seasons' array inside 'shows'? No, top level keys are movies, shows, seasons, episodes.
-        // Let's check docs: https://trakt.docs.apiary.io/#reference/sync/add-to-history/add-items-to-history
-        // Support: movies, shows, seasons, episodes, people.
-
         const endpoint = action === 'add' ? '/sync/history' : '/sync/history/remove';
         const payload = {
             seasons: [{
@@ -107,6 +107,20 @@ export class TraktClient {
             }]
         };
         return this.request(endpoint, 'POST', payload);
+    }
+
+    // --- Fetch Methods ---
+
+    async getWatchedHistory(type: 'movies' | 'shows' | 'episodes', page = 1, limit = 50) {
+        return this.request(`/sync/history/${type}?page=${page}&limit=${limit}&extended=metadata`, 'GET');
+    }
+
+    async getWatchlist(type: 'movies' | 'shows', page = 1, limit = 50) {
+        return this.request(`/sync/watchlist/${type}?page=${page}&limit=${limit}&extended=metadata`, 'GET');
+    }
+
+    async getRatings(type: 'movies' | 'shows' | 'episodes', page = 1, limit = 50) {
+        return this.request(`/sync/ratings/${type}?page=${page}&limit=${limit}&extended=metadata`, 'GET');
     }
     async getCalendarShows(startDate: string, days: number) {
         return this.request(`/calendars/my/shows/${startDate}/${days}`);
