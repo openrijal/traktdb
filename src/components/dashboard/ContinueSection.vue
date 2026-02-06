@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { TMDB_IMAGE_BASE_URL, PLACEHOLDER_IMAGE_URL } from '@/lib/constants';
+import { formatEpisodeLabel } from '@/lib/date';
 
 interface WatchingItem {
     id: number;
@@ -13,7 +14,18 @@ interface WatchingItem {
     updatedAt: string | null;
 }
 
+interface NextEpisodeInfo {
+    episodeId: number;
+    seasonNumber: number;
+    episodeNumber: number;
+    episodeName: string;
+    overview: string | null;
+    stillPath: string | null;
+    airDate: string | null;
+}
+
 const continueWatching = ref<WatchingItem[]>([]);
+const nextEpisodes = ref<Record<number, NextEpisodeInfo | null>>({});
 const loading = ref(true);
 const error = ref<string | null>(null);
 
@@ -33,6 +45,9 @@ async function fetchWatching() {
         const json = await response.json();
         if (json.success && json.data) {
             continueWatching.value = json.data;
+            if (json.data.length > 0) {
+                fetchNextEpisodes();
+            }
         } else {
             continueWatching.value = [];
         }
@@ -42,6 +57,29 @@ async function fetchWatching() {
     } finally {
         loading.value = false;
     }
+}
+
+async function fetchNextEpisodes() {
+    try {
+        const response = await fetch('/api/library/next-episode');
+        if (response.ok) {
+            const json = await response.json();
+            if (json.success && json.data) {
+                nextEpisodes.value = json.data;
+            }
+        }
+    } catch (e) {
+        // Graceful degradation: cards render without episode labels
+        console.error('Failed to fetch next episodes:', e);
+    }
+}
+
+function getNextEpisodeLabel(item: WatchingItem): string | null {
+    if (item.type !== 'tv') return null;
+    const ep = nextEpisodes.value[item.tmdbId];
+    if (!ep) return null;
+    const label = formatEpisodeLabel(ep.seasonNumber, ep.episodeNumber);
+    return `${label} · ${ep.episodeName}`;
 }
 
 function getImageUrl(item: WatchingItem): string {
@@ -81,6 +119,9 @@ onMounted(fetchWatching);
 
                 <div class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/90 to-transparent z-10">
                     <div class="text-sm font-medium text-white">{{ item.title }}</div>
+                    <div v-if="getNextEpisodeLabel(item)" class="text-xs text-white/70 truncate mt-0.5">
+                        {{ getNextEpisodeLabel(item) }}
+                    </div>
                     <div v-if="item.progress" class="mt-2 h-1 w-full bg-secondary rounded-full overflow-hidden">
                         <div class="h-full bg-primary" :style="{ width: `${Math.min(item.progress, 100)}%` }"></div>
                     </div>
