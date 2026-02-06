@@ -3,10 +3,13 @@ const LISTEN_NOTES_API_URL = 'https://listen-api.listennotes.com/api/v2';
 
 export interface ListenNotesPodcast {
     id: string;
-    title_original: string;
+    title?: string;
+    title_original?: string;
     title_highlighted?: string;
-    publisher_original: string;
+    publisher?: string;
+    publisher_original?: string;
     publisher_highlighted?: string;
+    description?: string;
     description_original?: string;
     description_highlighted?: string;
     image: string;
@@ -20,6 +23,18 @@ export interface ListenNotesPodcast {
     website?: string;
     explicit_content?: boolean;
     listennotes_url?: string;
+    rss?: string;
+    episodes?: {
+        id: string;
+        title: string;
+        description: string;
+        pub_date_ms: number;
+        audio: string;
+        audio_length_sec: number;
+        thumbnail: string;
+        maybe_audio_invalid: boolean;
+        listennotes_url: string;
+    }[];
 }
 
 export interface ListenNotesSearchResponse {
@@ -50,11 +65,11 @@ export const createListenNotes = (apiKey: string) => {
         if (!response.ok) {
             const errorText = await response.text();
             console.error(`Listen Notes API Error: ${response.status} ${response.statusText}`, errorText);
-            
+
             if (response.status === 429) {
                 throw new Error('Listen Notes API rate limit exceeded');
             }
-            
+
             throw new Error(`Listen Notes API Error: ${response.status} ${response.statusText}`);
         }
 
@@ -104,7 +119,7 @@ export const createListenNotes = (apiKey: string) => {
             const params: Record<string, string> = {};
             if (genreId) params.genre_id = genreId.toString();
             if (page) params.page = page.toString();
-            
+
             return fetchListenNotes<{
                 podcasts: ListenNotesPodcast[];
                 total: number;

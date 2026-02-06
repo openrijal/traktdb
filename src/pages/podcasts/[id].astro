@@ -1,6 +1,7 @@
 ---
 import AppLayout from "@/layouts/AppLayout.astro";
 import PodcastHeader from "@/components/podcasts/PodcastHeader.vue";
+import EpisodeList from "@/components/podcasts/EpisodeList.vue";
 
 const { id } = Astro.params;
 
@@ -50,16 +51,30 @@ try {
 
                     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                         {podcast.description && (
-                            <div class="prose prose-invert max-w-none">
-                                <h2 class="text-xl font-semibold mb-4">About</h2>
-                                <p class="text-muted-foreground leading-relaxed">{podcast.description}</p>
+                            <div class="prose prose-invert max-w-none mb-12">
+                                <h2 class="text-xl font-semibold mb-4">
+                                    About
+                                </h2>
+                                <p
+                                    class="text-muted-foreground leading-relaxed"
+                                    set:html={podcast.description}
+                                />
                             </div>
+                        )}
+
+                        {podcast.episodes && podcast.episodes.length > 0 && (
+                            <EpisodeList
+                                client:visible
+                                episodes={podcast.episodes}
+                            />
                         )}
                     </div>
                 </>
             ) : (
                 <div class="flex items-center justify-center min-h-[50vh]">
-                    <div class="animate-pulse text-muted-foreground">Loading...</div>
+                    <div class="animate-pulse text-muted-foreground">
+                        Loading...
+                    </div>
                 </div>
             )
         }

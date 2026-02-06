@@ -27,11 +27,10 @@ const handleSignOut = async () => {
     });
 };
 
-    const links = [
+const links = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Library', href: '/library', icon: Library },
     { name: 'Friends', href: '/friends', icon: Users },
-    { name: 'Settings', href: '/settings', icon: Settings },
 ];
 
 function isActive(href: string) {
@@ -60,12 +59,7 @@ function isActive(href: string) {
         </nav>
 
         <div class="p-4 mt-auto">
-            <Button variant="ghost"
-                class="w-full justify-start gap-3 px-3 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-                @click="handleSignOut">
-                <LogOut class="h-4 w-4" />
-                Sign Out
-            </Button>
+            <!-- Footer content if needed -->
         </div>
     </div>
 </template>

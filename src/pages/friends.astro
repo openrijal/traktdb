@@ -1,4 +1,3 @@
-
 ---
 import AppLayout from "@/layouts/AppLayout.astro";
 import FriendsDashboard from "@/components/friends/FriendsDashboard.vue";
@@ -14,11 +13,11 @@ if (!session) {
 ---
 
 <AppLayout>
-    <main class="min-h-screen pb-20">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <h1 class="text-3xl font-bold text-foreground mb-8">Friends</h1>
-            
-            <FriendsDashboard client:load />
-        </div>
+    <main class="container py-6">
+        <header class="mb-6">
+            <h1 class="text-3xl font-bold tracking-tight">Friends</h1>
+        </header>
+
+        <FriendsDashboard client:load />
     </main>
 </AppLayout>
