@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { Play } from 'lucide-vue-next';
 import { TMDB_IMAGE_BASE_URL, PLACEHOLDER_IMAGE_URL } from '@/lib/constants';
 
 interface WatchingItem {
@@ -51,7 +50,7 @@ function getImageUrl(item: WatchingItem): string {
 }
 
 function getDetailUrl(item: WatchingItem): string {
-    return `/${item.type}/${item.tmdbId}`;
+    return `/media/${item.type}/${item.tmdbId}`;
 }
 
 onMounted(fetchWatching);
@@ -78,8 +77,7 @@ onMounted(fetchWatching);
                 class="min-w-[250px] aspect-video bg-muted rounded-lg flex items-center justify-center relative group cursor-pointer overflow-hidden border border-border/50">
                 <img :src="getImageUrl(item)" :alt="item.title"
                     class="absolute inset-0 w-full h-full object-cover" loading="lazy" />
-                <div class="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors"></div>
-                <Play class="fill-white text-white w-12 h-12 opacity-80 group-hover:scale-110 transition-transform relative z-10" />
+                <div class="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors"></div>
 
                 <div class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/90 to-transparent z-10">
                     <div class="text-sm font-medium text-white">{{ item.title }}</div>
@@ -91,7 +89,9 @@ onMounted(fetchWatching);
         </div>
 
         <div v-else class="py-8 text-center bg-muted/30 rounded-lg border border-border/50 border-dashed">
-            <Play class="mx-auto h-8 w-8 text-muted-foreground/50 mb-3" />
+            <svg class="mx-auto h-8 w-8 text-muted-foreground/50 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            </svg>
             <p class="text-muted-foreground">Start watching shows to see them here.</p>
         </div>
     </div>

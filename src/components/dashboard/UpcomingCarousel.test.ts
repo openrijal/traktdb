@@ -17,9 +17,18 @@ vi.mock('@/components/ui/badge', () => ({
     }
 }));
 
-vi.mock('@/components/ui/card', () => ({
-    Card: { template: '<div><slot /></div>' },
-    CardContent: { template: '<div><slot /></div>' }
+vi.mock('@/components/ui/dialog', () => ({
+    Dialog: {
+        template: '<div data-testid="dialog" :data-open="open"><slot /></div>',
+        props: ['open']
+    },
+    DialogContent: {
+        template: '<div data-testid="dialog-content"><slot /></div>',
+        props: ['class']
+    },
+    DialogHeader: { template: '<div><slot /></div>' },
+    DialogTitle: { template: '<h2 data-testid="dialog-title"><slot /></h2>' },
+    DialogDescription: { template: '<p data-testid="dialog-description"><slot /></p>' },
 }));
 
 vi.mock('lucide-vue-next', () => ({
@@ -161,6 +170,93 @@ describe('UpcomingCarousel.vue', () => {
             });
             const posters = wrapper.findAll('[data-testid="tmdb-poster"]');
             expect(posters.length).toBe(1);
+        });
+
+        it('uses hover:-translate-y-1 (consistent with MediaCard)', () => {
+            const wrapper = mount(UpcomingCarousel, {
+                props: { items: [mockMovieItem], loading: false }
+            });
+            const card = wrapper.find('.snap-start');
+            expect(card.classes()).toContain('motion-safe:hover:-translate-y-1');
+        });
+
+        it('uses line-clamp-1 for title (consistent with MediaCard)', () => {
+            const wrapper = mount(UpcomingCarousel, {
+                props: { items: [mockMovieItem], loading: false }
+            });
+            const title = wrapper.find('h3');
+            expect(title.classes()).toContain('line-clamp-1');
+        });
+    });
+
+    describe('dialog interaction', () => {
+        const mockShowWithEpisodes = [
+            {
+                type: 'show', title: 'Breaking Bad', date: '2025-03-15',
+                ids: { tmdb: 100 }, episodeTitle: 'Pilot', season: 1, number: 1,
+                overview: 'A chemistry teacher starts making meth', runtime: 60
+            },
+            {
+                type: 'show', title: 'Breaking Bad', date: '2025-03-22',
+                ids: { tmdb: 100 }, episodeTitle: 'Cat\'s in the Bag', season: 1, number: 2,
+                overview: 'Walt and Jesse deal with aftermath', runtime: 60
+            },
+        ];
+
+        it('opens dialog when clicking a carousel item', async () => {
+            const wrapper = mount(UpcomingCarousel, {
+                props: { items: mockShowWithEpisodes, loading: false }
+            });
+
+            const card = wrapper.find('.snap-start');
+            await card.trigger('click');
+
+            const dialog = wrapper.find('[data-testid="dialog"]');
+            expect(dialog.attributes('data-open')).toBe('true');
+        });
+
+        it('shows episode details in dialog for shows', async () => {
+            const wrapper = mount(UpcomingCarousel, {
+                props: { items: mockShowWithEpisodes, loading: false }
+            });
+
+            await wrapper.find('.snap-start').trigger('click');
+
+            expect(wrapper.text()).toContain('Breaking Bad');
+            expect(wrapper.text()).toContain('Pilot');
+            expect(wrapper.text()).toContain('S01E01');
+            expect(wrapper.text()).toContain('S01E02');
+            expect(wrapper.text()).toContain('2 upcoming episodes');
+        });
+
+        it('shows movie details in dialog', async () => {
+            const movieItem = {
+                type: 'movie', title: 'Test Movie', date: '2025-03-15',
+                ids: { tmdb: 555 }, overview: 'A test movie plot', runtime: 120, rating: 7.5
+            };
+
+            const wrapper = mount(UpcomingCarousel, {
+                props: { items: [movieItem], loading: false }
+            });
+
+            await wrapper.find('.snap-start').trigger('click');
+
+            expect(wrapper.text()).toContain('Test Movie');
+            expect(wrapper.text()).toContain('A test movie plot');
+            expect(wrapper.text()).toContain('2h 0m');
+            expect(wrapper.text()).toContain('7.5 / 10');
+        });
+
+        it('shows "View Full Details" link with correct URL', async () => {
+            const wrapper = mount(UpcomingCarousel, {
+                props: { items: mockShowWithEpisodes, loading: false }
+            });
+
+            await wrapper.find('.snap-start').trigger('click');
+
+            const link = wrapper.find('a[href*="/media/"]');
+            expect(link.exists()).toBe(true);
+            expect(link.attributes('href')).toBe('/media/tv/100');
         });
     });
 });

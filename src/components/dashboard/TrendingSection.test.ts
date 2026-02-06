@@ -15,6 +15,16 @@ vi.mock('lucide-vue-next', () => ({
     Loader2: { template: '<svg data-testid="loader-icon" class="animate-spin" />' }
 }));
 
+vi.mock('@/lib/constants', () => ({
+    MediaType: { MOVIE: 'movie', TV: 'tv' },
+    WatchStatus: {
+        PLAN_TO_WATCH: 'plan_to_watch',
+        COMPLETED: 'completed',
+        WATCHING: 'watching',
+        DROPPED: 'dropped',
+    }
+}));
+
 describe('TrendingSection.vue', () => {
     const mockFetch = vi.fn();
 
@@ -52,9 +62,17 @@ describe('TrendingSection.vue', () => {
             { id: 2, title: 'Show 1', media_type: 'tv', poster_path: '/p2.jpg', vote_average: 8.0 },
         ];
 
-        mockFetch.mockResolvedValue({
-            ok: true,
-            json: () => Promise.resolve({ results: mockResults })
+        mockFetch.mockImplementation((url: string) => {
+            if (url === '/api/media/trending') {
+                return Promise.resolve({
+                    ok: true,
+                    json: () => Promise.resolve({ results: mockResults })
+                });
+            }
+            return Promise.resolve({
+                ok: true,
+                json: () => Promise.resolve({ status: null })
+            });
         });
 
         const wrapper = mount(TrendingSection);
@@ -73,12 +91,21 @@ describe('TrendingSection.vue', () => {
             vote_average: 5 + Math.random() * 5
         }));
 
-        mockFetch.mockResolvedValue({
-            ok: true,
-            json: () => Promise.resolve({ results: mockResults })
+        mockFetch.mockImplementation((url: string) => {
+            if (url === '/api/media/trending') {
+                return Promise.resolve({
+                    ok: true,
+                    json: () => Promise.resolve({ results: mockResults })
+                });
+            }
+            return Promise.resolve({
+                ok: true,
+                json: () => Promise.resolve({ status: null })
+            });
         });
 
         const wrapper = mount(TrendingSection);
+        await flushPromises();
         await flushPromises();
 
         const cards = wrapper.findAll('[data-testid="media-card"]');
@@ -106,17 +133,24 @@ describe('TrendingSection.vue', () => {
         expect(wrapper.text()).toContain('An error occurred');
     });
 
-    it('uses initialData prop when provided', async () => {
+    it('uses initialData prop when provided (skips trending fetch)', async () => {
         const initialData = [
             { id: 1, title: 'Pre-loaded', media_type: 'movie', poster_path: '/p.jpg', vote_average: 9.0 },
         ];
+
+        // Status check calls will happen via fetchStatuses
+        mockFetch.mockResolvedValue({
+            ok: true,
+            json: () => Promise.resolve({ status: null })
+        });
 
         const wrapper = mount(TrendingSection, {
             props: { initialData }
         });
         await flushPromises();
 
-        expect(mockFetch).not.toHaveBeenCalled();
+        // Should not fetch trending API, but may fetch library statuses
+        expect(mockFetch).not.toHaveBeenCalledWith('/api/media/trending');
         expect(wrapper.text()).toContain('Pre-loaded');
     });
 
@@ -131,5 +165,77 @@ describe('TrendingSection.vue', () => {
 
         const grid = wrapper.find('.grid');
         expect(grid.classes()).toContain('lg:grid-cols-6');
+    });
+
+    it('filters out watched/watching/dropped items after status fetch', async () => {
+        const mockResults = [
+            { id: 1, title: 'Unwatched Movie', media_type: 'movie', poster_path: '/p1.jpg', vote_average: 7 },
+            { id: 2, title: 'Watched Movie', media_type: 'movie', poster_path: '/p2.jpg', vote_average: 8 },
+            { id: 3, title: 'Watching Show', media_type: 'tv', poster_path: '/p3.jpg', vote_average: 6 },
+        ];
+
+        // First call: trending API; subsequent calls: library status
+        let callCount = 0;
+        mockFetch.mockImplementation((url: string) => {
+            if (url === '/api/media/trending') {
+                return Promise.resolve({
+                    ok: true,
+                    json: () => Promise.resolve({ results: mockResults })
+                });
+            }
+            // Status calls
+            if (url.includes('tmdbId=2')) {
+                return Promise.resolve({
+                    ok: true,
+                    json: () => Promise.resolve({ status: 'completed' })
+                });
+            }
+            if (url.includes('tmdbId=3')) {
+                return Promise.resolve({
+                    ok: true,
+                    json: () => Promise.resolve({ status: 'watching' })
+                });
+            }
+            return Promise.resolve({
+                ok: true,
+                json: () => Promise.resolve({ status: null })
+            });
+        });
+
+        const wrapper = mount(TrendingSection);
+        await flushPromises();
+        // Wait for status fetches
+        await flushPromises();
+
+        const cards = wrapper.findAll('[data-testid="media-card"]');
+        expect(cards.length).toBe(1);
+        expect(cards[0].text()).toContain('Unwatched Movie');
+    });
+
+    it('keeps plan_to_watch items in trending', async () => {
+        const mockResults = [
+            { id: 1, title: 'Plan to Watch', media_type: 'movie', poster_path: '/p.jpg', vote_average: 7 },
+        ];
+
+        mockFetch.mockImplementation((url: string) => {
+            if (url === '/api/media/trending') {
+                return Promise.resolve({
+                    ok: true,
+                    json: () => Promise.resolve({ results: mockResults })
+                });
+            }
+            return Promise.resolve({
+                ok: true,
+                json: () => Promise.resolve({ status: 'plan_to_watch' })
+            });
+        });
+
+        const wrapper = mount(TrendingSection);
+        await flushPromises();
+        await flushPromises();
+
+        const cards = wrapper.findAll('[data-testid="media-card"]');
+        expect(cards.length).toBe(1);
+        expect(cards[0].text()).toContain('Plan to Watch');
     });
 });

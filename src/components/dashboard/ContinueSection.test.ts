@@ -2,10 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount, flushPromises } from '@vue/test-utils';
 import ContinueSection from './ContinueSection.vue';
 
-// Mock lucide-vue-next icons
-vi.mock('lucide-vue-next', () => ({
-    Play: { template: '<svg data-testid="play-icon" />' }
-}));
+// No lucide icons needed after removing Play button
 
 // Mock constants
 vi.mock('@/lib/constants', () => ({
@@ -56,7 +53,7 @@ describe('ContinueSection.vue', () => {
         expect(wrapper.find('.border-dashed').exists()).toBe(true);
     });
 
-    it('renders Play icon in empty state', async () => {
+    it('renders SVG icon in empty state (no Play button)', async () => {
         mockFetch.mockResolvedValue({
             ok: true,
             json: () => Promise.resolve({ success: true, data: [] })
@@ -65,8 +62,8 @@ describe('ContinueSection.vue', () => {
         const wrapper = mount(ContinueSection);
         await flushPromises();
 
-        const icon = wrapper.find('[data-testid="play-icon"]');
-        expect(icon.exists()).toBe(true);
+        const svg = wrapper.find('.border-dashed svg');
+        expect(svg.exists()).toBe(true);
     });
 
     it('renders watching items when data is returned', async () => {
@@ -96,6 +93,27 @@ describe('ContinueSection.vue', () => {
         expect(wrapper.find('.border-dashed').exists()).toBe(false);
     });
 
+    it('does not render Play button on cards', async () => {
+        mockFetch.mockResolvedValue({
+            ok: true,
+            json: () => Promise.resolve({
+                success: true,
+                data: [{
+                    id: 1, tmdbId: 100, type: 'tv', title: 'Test Show',
+                    posterPath: null, backdropPath: null,
+                    progress: 0, updatedAt: null
+                }]
+            })
+        });
+
+        const wrapper = mount(ContinueSection);
+        await flushPromises();
+
+        // No Play icon should exist on cards (it was removed)
+        const playIcons = wrapper.findAll('[data-testid="play-icon"]');
+        expect(playIcons.length).toBe(0);
+    });
+
     it('renders item links with correct href', async () => {
         mockFetch.mockResolvedValue({
             ok: true,
@@ -113,7 +131,7 @@ describe('ContinueSection.vue', () => {
         await flushPromises();
 
         const link = wrapper.find('a');
-        expect(link.attributes('href')).toBe('/tv/100');
+        expect(link.attributes('href')).toBe('/media/tv/100');
     });
 
     it('renders backdrop images with TMDB base URL', async () => {

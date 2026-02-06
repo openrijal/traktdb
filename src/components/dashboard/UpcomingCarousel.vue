@@ -1,28 +1,39 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
-import { ChevronRight, Calendar } from 'lucide-vue-next';
+import { Calendar, ChevronRight } from 'lucide-vue-next';
 import TmdbPoster from '@/components/common/TmdbPoster.vue';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+} from '@/components/ui/dialog';
 
 interface CalendarProps {
-    items: any[]; // The raw items from API
+    items: any[];
     loading?: boolean;
 }
 
 const props = defineProps<CalendarProps>();
 
-const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p/w500';
-
 interface CalendarGroup {
-    id: string; // Composite key
+    id: string;
     type: 'show' | 'movie';
     title: string;
     posterUrl: string | null;
     items: any[];
-    upcomingDate: string; // ISO Date of the earliest item in group
-    displayDate: string; // Formatted date string
+    upcomingDate: string;
+    displayDate: string;
+}
+
+const selectedGroup = ref<CalendarGroup | null>(null);
+const dialogOpen = ref(false);
+
+function openDetail(group: CalendarGroup) {
+    selectedGroup.value = group;
+    dialogOpen.value = true;
 }
 
 const groups = computed(() => {
@@ -31,42 +42,27 @@ const groups = computed(() => {
     const grouped: CalendarGroup[] = [];
     const showMap = new Map<number, CalendarGroup>();
 
-    // Sort items by date first (API should have sorted, but ensure)
     const sortedItems = [...props.items].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
     for (const item of sortedItems) {
         if (item.type === 'movie') {
-            // Movies are standalone groups (unless we support Collections later)
             grouped.push({
                 id: `movie-${item.ids.tmdb}`,
                 type: 'movie',
                 title: item.title,
-                posterUrl: null, // Image handled by TmdbPoster component using TMDB ID except for movies where we might have path if we fetched it. But we didn't. 
-                // Ah, the calendar API from Trakt might NOT give the poster path directly if not extended. 
-                // But wait, the previous plan assumed we use TMDB ID to get images. 
-                // We don't have the path unless we fetch it. 
-                // Or maybe we can lazily fetch or use a placeholders.
-                // However, for now, let's assume we might not have the path and handle it.
-                // WAIT! `getPosterPath` is tricky without fetching. 
-                // The `media.ts` upsert logic FETCHES data. 
-                // If we want instant display, we might need a client-side component that fetches the image by ID?
-                // OR we can use the `tmdb-image` component if created? 
-
-                // Let's defer image loading to a sub-component or just use a generic placeholder if missing.
+                posterUrl: null,
                 items: [item],
                 upcomingDate: item.date,
                 displayDate: formatDate(item.date)
             });
         } else {
-            // Episodes: Group by Show TMDB ID
-            // CHECK: Does Trakt return the Show ID? Yes `item.ids.tmdb`.
             const showId = item.ids.tmdb;
             if (!showMap.has(showId)) {
                 const group: CalendarGroup = {
                     id: `show-${showId}`,
                     type: 'show',
                     title: item.title,
-                    posterUrl: null, // We don't have it yet!
+                    posterUrl: null,
                     items: [],
                     upcomingDate: item.date,
                     displayDate: formatDate(item.date)
@@ -79,7 +75,6 @@ const groups = computed(() => {
         }
     }
 
-    // Resort groups by their earliest upcoming date
     return grouped.sort((a, b) => new Date(a.upcomingDate).getTime() - new Date(b.upcomingDate).getTime());
 });
 
@@ -88,15 +83,21 @@ function formatDate(dateStr: string) {
     return new Intl.DateTimeFormat('en-US', { weekday: 'short', month: 'short', day: 'numeric' }).format(d);
 }
 
-// Helper to construct image URL - NOTE: We don't have the path in the calendar response sadly unless we fetch.
-// We really need a component that takes ID and type and renders the image.
-// I'll assume we can't get the path synchronously.
+function formatEpisodeDate(dateStr: string) {
+    const d = new Date(dateStr);
+    return new Intl.DateTimeFormat('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }).format(d);
+}
+
+function formatRuntime(minutes: number | undefined) {
+    if (!minutes) return null;
+    if (minutes < 60) return `${minutes}m`;
+    return `${Math.floor(minutes / 60)}h ${minutes % 60}m`;
+}
 </script>
 
 <template>
     <div class="space-y-4">
         <div v-if="loading" class="flex gap-4 overflow-hidden">
-            <!-- Skeletons -->
             <div v-for="i in 4" :key="i" class="w-[140px] h-[210px] bg-muted animate-pulse rounded-lg shrink-0"></div>
         </div>
 
@@ -107,14 +108,10 @@ function formatDate(dateStr: string) {
         </div>
 
         <div v-else class="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x">
-            <div v-for="group in groups" :key="group.id"
-                class="snap-start shrink-0 w-[140px] group relative cursor-pointer transition-transform hover:scale-105">
+            <div v-for="group in groups" :key="group.id" @click="openDetail(group)"
+                class="snap-start shrink-0 w-[140px] group relative cursor-pointer motion-safe:transition-all motion-safe:duration-300 motion-safe:hover:-translate-y-1 hover:shadow-lg">
                 <div class="aspect-[2/3] rounded-lg overflow-hidden bg-muted relative shadow-md">
-                    <!-- Image Handling: Since we only have ID, we need a component to fetch/display image -->
-                    <!-- For now, I'll use a placeholder or a dedicated async image component if available. -->
-                    <!-- I will create a simple TmdbPoster component inline or separate if needed. -->
-                    <!-- Actually, I can use the `/api/media/...` or direct TMDB fetch in a child component. -->
-                    <TmdbPoster :tmdb-id="group.type === 'show' ? group.items[0].ids.tmdb : group.items[0].ids.tmdb"
+                    <TmdbPoster :tmdb-id="group.items[0].ids.tmdb"
                         :type="group.type" class="w-full h-full object-cover" />
 
                     <div
@@ -124,11 +121,11 @@ function formatDate(dateStr: string) {
                 </div>
 
                 <div class="mt-2 text-sm">
-                    <h3 class="font-medium leading-none truncate" :title="group.title">{{ group.title }}</h3>
+                    <h3 class="font-semibold text-foreground line-clamp-1 motion-safe:group-hover:text-primary motion-safe:transition-colors"
+                        :title="group.title">{{ group.title }}</h3>
                     <p class="text-xs text-muted-foreground mt-1">{{ group.displayDate }}</p>
                 </div>
 
-                <!-- Bagdes -->
                 <div class="absolute top-2 right-2 flex flex-col gap-1">
                     <Badge v-if="group.items.length > 1" variant="secondary"
                         class="text-[10px] h-5 px-1.5 shadow-sm bg-background/80 backdrop-blur-sm">
@@ -141,5 +138,80 @@ function formatDate(dateStr: string) {
                 </div>
             </div>
         </div>
+
+        <!-- Detail Dialog -->
+        <Dialog v-model:open="dialogOpen">
+            <DialogContent v-if="selectedGroup" class="max-h-[85vh] overflow-y-auto">
+                <DialogHeader>
+                    <DialogTitle>{{ selectedGroup.title }}</DialogTitle>
+                    <DialogDescription>
+                        <span v-if="selectedGroup.type === 'show'">
+                            {{ selectedGroup.items.length }} upcoming episode{{ selectedGroup.items.length > 1 ? 's' : '' }}
+                        </span>
+                        <span v-else>
+                            Releasing {{ selectedGroup.displayDate }}
+                        </span>
+                    </DialogDescription>
+                </DialogHeader>
+
+                <!-- Show: Episode list -->
+                <div v-if="selectedGroup.type === 'show'" class="space-y-3 mt-2">
+                    <div v-for="ep in selectedGroup.items" :key="`${ep.season}-${ep.number}`"
+                        class="flex gap-3 p-3 rounded-lg bg-muted/50 border border-border/50">
+                        <div class="shrink-0 w-10 h-10 rounded-md bg-primary/10 text-primary flex items-center justify-center text-sm font-bold">
+                            {{ ep.number }}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2">
+                                <span class="font-medium text-sm line-clamp-1">
+                                    {{ ep.episodeTitle || `Episode ${ep.number}` }}
+                                </span>
+                            </div>
+                            <div class="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
+                                <span>S{{ String(ep.season).padStart(2, '0') }}E{{ String(ep.number).padStart(2, '0') }}</span>
+                                <span>&middot;</span>
+                                <span>{{ formatEpisodeDate(ep.date) }}</span>
+                                <template v-if="formatRuntime(ep.runtime)">
+                                    <span>&middot;</span>
+                                    <span>{{ formatRuntime(ep.runtime) }}</span>
+                                </template>
+                            </div>
+                            <p v-if="ep.overview" class="text-xs text-muted-foreground mt-2 line-clamp-2">
+                                {{ ep.overview }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Movie: Details -->
+                <div v-else class="space-y-3 mt-2">
+                    <div class="flex items-center gap-2 text-sm text-muted-foreground">
+                        <span>{{ selectedGroup.displayDate }}</span>
+                        <template v-if="formatRuntime(selectedGroup.items[0]?.runtime)">
+                            <span>&middot;</span>
+                            <span>{{ formatRuntime(selectedGroup.items[0]?.runtime) }}</span>
+                        </template>
+                        <template v-if="selectedGroup.items[0]?.rating">
+                            <span>&middot;</span>
+                            <span>{{ selectedGroup.items[0].rating.toFixed(1) }} / 10</span>
+                        </template>
+                    </div>
+                    <p v-if="selectedGroup.items[0]?.overview" class="text-sm text-muted-foreground">
+                        {{ selectedGroup.items[0].overview }}
+                    </p>
+                    <p v-else class="text-sm text-muted-foreground italic">
+                        No overview available.
+                    </p>
+                </div>
+
+                <!-- View Details link -->
+                <div class="mt-4 pt-3 border-t border-border">
+                    <a :href="`/media/${selectedGroup.type === 'show' ? 'tv' : 'movie'}/${selectedGroup.items[0].ids.tmdb}`"
+                        class="text-sm text-primary hover:underline font-medium">
+                        View Full Details &rarr;
+                    </a>
+                </div>
+            </DialogContent>
+        </Dialog>
     </div>
 </template>
