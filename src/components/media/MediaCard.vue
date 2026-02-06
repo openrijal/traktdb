@@ -3,7 +3,8 @@ import { computed, ref } from 'vue';
 import { Star } from 'lucide-vue-next';
 import WatchStatusButton from './WatchStatusButton.vue';
 import { Card, CardContent } from '@/components/ui/card';
-import { TMDB_IMAGE_BASE_URL, PLACEHOLDER_IMAGE_URL, MediaType } from '@/lib/constants';
+import { MediaType } from '@/lib/constants';
+import { getTmdbImageUrl } from '@/lib/images';
 import { useLibraryStore } from '@/stores/library';
 
 const props = defineProps<{
@@ -25,11 +26,7 @@ const props = defineProps<{
 const imageLoaded = ref(false);
 const imageError = ref(false);
 
-const posterUrl = computed(() =>
-    props.media.poster_path
-        ? `${TMDB_IMAGE_BASE_URL}${props.media.poster_path}`
-        : PLACEHOLDER_IMAGE_URL
-);
+const posterUrl = computed(() => getTmdbImageUrl(props.media.poster_path));
 
 const displayTitle = computed(() => props.media.title || props.media.name || 'Unknown');
 
@@ -77,15 +74,17 @@ const onImageError = () => {
                 <div v-if="!imageLoaded" class="absolute inset-0 bg-muted animate-pulse" />
                 
                 <!-- Image Fallback Placeholder -->
-                <div v-if="imageError" class="absolute inset-0 bg-muted flex items-center justify-center">
-                    <svg class="w-12 h-12 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div v-if="imageError" class="absolute inset-0 bg-muted flex flex-col items-center justify-center gap-2">
+                    <svg class="w-10 h-10 text-muted-foreground/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
+                    <span class="text-xs text-muted-foreground/40">No Image</span>
                 </div>
                 
-                <img 
+                <img
                     v-show="imageLoaded && !imageError"
-                    :src="posterUrl" 
+                    v-if="posterUrl"
+                    :src="posterUrl"
                     :alt="displayTitle"
                     class="w-full h-full object-cover motion-safe:transition-transform motion-safe:duration-500 motion-safe:group-hover:scale-105"
                     loading="lazy"

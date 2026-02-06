@@ -1,7 +1,5 @@
 ---
 import AppLayout from "@/layouts/AppLayout.astro";
-import { useAuthStore } from "@/stores/auth";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ContinueSection from "@/components/dashboard/ContinueSection.vue";
 import UpcomingList from "@/components/dashboard/UpcomingList.vue";
 import TrendingSection from "@/components/dashboard/TrendingSection.vue";
@@ -14,23 +12,12 @@ if (!user) {
 ---
 
 <AppLayout>
-    <div class="container py-10">
-        <header class="mb-8 flex items-center justify-between">
+    <div class="container py-6">
+        <header class="mb-6">
             <h1 class="text-3xl font-bold tracking-tight">Dashboard</h1>
-            <div class="flex items-center gap-4">
-                <span class="text-sm text-muted-foreground"
-                    >Welcome, {user.name}</span
-                >
-                <a href="/profile" class="text-sm font-medium hover:underline"
-                    >Profile</a
-                >
-                <form method="POST" action="/logout" class="inline">
-                    <!-- TODO: Logout logic -->
-                </form>
-            </div>
         </header>
 
-        <div class="space-y-12">
+        <div class="space-y-10">
             <!-- Continue Watching Section -->
             <section>
                 <ContinueSection client:load />

@@ -61,10 +61,10 @@ describe('UpcomingList.vue', () => {
     });
 
     it('Passes data to carousel on success', async () => {
-        const cachedData = [{ id: 1, title: 'Show 1' }];
+        const apiData = [{ id: 1, title: 'Show 1' }];
         mockFetch.mockResolvedValue({
             ok: true,
-            json: () => Promise.resolve({ success: true, data: { days: cachedData } })
+            json: () => Promise.resolve({ success: true, data: apiData })
         });
 
         // Ensure cache is missed so fetch is called
@@ -75,10 +75,8 @@ describe('UpcomingList.vue', () => {
 
         expect(wrapper.findComponent({ name: 'UpcomingCarousel' }).exists()).toBe(true);
         const carousel = wrapper.findComponent({ name: 'UpcomingCarousel' });
-        // The component logic transforms API data. Assuming simple pass-through or similar.
-        // Actually the component passes `items`.
-        expect(carousel.props('items')).toEqual(cachedData);
-        expect(setCalendarCache).toHaveBeenCalledWith(cachedData);
+        expect(carousel.props('items')).toEqual(apiData);
+        expect(setCalendarCache).toHaveBeenCalledWith(apiData);
     });
 
     it('uses cache if available', async () => {
@@ -102,7 +100,7 @@ describe('UpcomingList.vue', () => {
 
         mockFetch.mockResolvedValue({
             ok: true,
-            json: () => Promise.resolve({ data: { days: [] } })
+            json: () => Promise.resolve({ success: true, data: [] })
         });
 
         // Initial load used cache
