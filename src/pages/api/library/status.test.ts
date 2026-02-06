@@ -1,6 +1,6 @@
-
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { GET, POST } from './status';
+import { createTestRequest } from '@/lib/test-utils';
 
 // Mocks
 const mockSession = {
@@ -60,18 +60,20 @@ describe('API: /api/library/status', () => {
     describe('GET', () => {
         it('should return 401 if not authenticated', async () => {
             // Access the mock directly via the imported module function
-            (createAuth() as any).api.getSession.mockResolvedValue(null);
+            (createAuth({} as any) as any).api.getSession.mockResolvedValue(null);
 
-            const req = new Request('http://localhost/api/library/status?tmdbId=100&type=movie');
+            const req = createTestRequest('/api/library/status', {
+                params: { tmdbId: '100', type: 'movie' }
+            });
             const res = await GET({ request: req, locals: {} } as any);
 
             expect(res.status).toBe(401);
         });
 
         it('should return 400 if params are missing', async () => {
-            (createAuth() as any).api.getSession.mockResolvedValue(mockSession);
+            (createAuth({} as any) as any).api.getSession.mockResolvedValue(mockSession);
 
-            const req = new Request('http://localhost/api/library/status'); // Partial params
+            const req = createTestRequest('/api/library/status'); // Partial params
             const res = await GET({ request: req, locals: {} } as any);
 
             expect(res.status).toBe(400);
@@ -82,12 +84,11 @@ describe('API: /api/library/status', () => {
 
     describe('POST', () => {
         it('should return 403 if CSRF header is missing', async () => {
-            (createAuth() as any).api.getSession.mockResolvedValue(mockSession);
+            (createAuth({} as any) as any).api.getSession.mockResolvedValue(mockSession);
 
-            const req = new Request('http://localhost/api/library/status', {
+            const req = createTestRequest('/api/library/status', {
                 method: 'POST',
-                body: JSON.stringify({ tmdbId: 100, type: 'movie', status: 'watching' }),
-                headers: { 'Content-Type': 'application/json' }
+                body: { tmdbId: 100, type: 'movie', status: 'watching' }
                 // Missing X-Requested-With
             });
             const res = await POST({ request: req, locals: {} } as any);
@@ -98,16 +99,15 @@ describe('API: /api/library/status', () => {
         });
 
         it('should succeed with valid auth and headers', async () => {
-            (createAuth() as any).api.getSession.mockResolvedValue(mockSession);
+            (createAuth({} as any) as any).api.getSession.mockResolvedValue(mockSession);
 
             // Mock DB find existing media
             mockDb.limit.mockResolvedValueOnce([{ id: 1 }]); // Found media item
 
-            const req = new Request('http://localhost/api/library/status', {
+            const req = createTestRequest('/api/library/status', {
                 method: 'POST',
-                body: JSON.stringify({ tmdbId: 100, type: 'movie', status: 'watching' }),
+                body: { tmdbId: 100, type: 'movie', status: 'watching' },
                 headers: {
-                    'Content-Type': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest'
                 }
             });
