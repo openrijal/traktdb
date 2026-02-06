@@ -1,0 +1,32 @@
+---
+import AppLayout from "@/layouts/AppLayout.astro";
+import TraktConnection from "@/components/settings/TraktConnection.vue";
+
+const { user } = Astro.locals;
+
+if (!user) {
+    return Astro.redirect("/login");
+}
+---
+
+<AppLayout>
+    <div class="container max-w-2xl py-10">
+        <div class="space-y-6">
+            <div>
+                <h3 class="text-lg font-medium">Settings</h3>
+                <p class="text-sm text-muted-foreground">
+                    Manage your app preferences and connected accounts.
+                </p>
+            </div>
+            <div class="h-px bg-border"></div>
+
+            <div>
+                <h3 class="text-lg font-medium">Connected Accounts</h3>
+                <p class="text-sm text-muted-foreground">
+                    Link external services to enhance your experience.
+                </p>
+            </div>
+            <TraktConnection client:load />
+        </div>
+    </div>
+</AppLayout>

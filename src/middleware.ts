@@ -2,7 +2,7 @@ import { createAuth } from "./lib/auth";
 import { defineMiddleware } from "astro/middleware";
 
 export const onRequest = defineMiddleware(async (context, next) => {
-    const isProtectedRoute = context.url.pathname.startsWith("/dashboard") || context.url.pathname.startsWith("/profile");
+    const isProtectedRoute = context.url.pathname.startsWith("/dashboard") || context.url.pathname.startsWith("/profile") || context.url.pathname.startsWith("/settings");
     const isAuthPage = context.url.pathname === "/login" || context.url.pathname === "/register";
 
     // @ts-ignore
