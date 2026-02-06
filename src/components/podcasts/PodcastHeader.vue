@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { Headphones, Podcast, ExternalLink } from 'lucide-vue-next';
+import { Headphones, Podcast, ExternalLink, ArrowLeft } from 'lucide-vue-next';
 import ListenStatusButton from './ListenStatusButton.vue';
 
 const props = defineProps<{
@@ -21,11 +21,11 @@ const props = defineProps<{
     };
 }>();
 
-const imageUrl = computed(() => 
+const imageUrl = computed(() =>
     props.podcast.image || props.podcast.thumbnail || null
 );
 
-const podcastExternalId = computed(() => 
+const podcastExternalId = computed(() =>
     props.podcast.listenNotesId || props.podcast.id
 );
 
@@ -49,13 +49,23 @@ const podcastDataForStatus = computed(() => ({
             <div class="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-background/40"></div>
         </div>
 
+        <!-- Back Button -->
+        <div class="absolute top-4 left-4 z-20 md:top-8 md:left-8">
+            <a href="/library?type=podcast"
+                class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-background/20 backdrop-blur-md border border-white/10 hover:bg-background/40 transition-colors text-sm font-medium text-foreground">
+                <ArrowLeft class="w-4 h-4" />
+                <span>Back</span>
+            </a>
+        </div>
+
         <!-- Content Container -->
         <div
             class="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex flex-col md:flex-row gap-8 items-start">
 
             <!-- Artwork -->
             <div class="w-48 md:w-64 rounded-2xl overflow-hidden shadow-md border-4 border-white/10 shrink-0">
-                <img v-if="imageUrl" :src="imageUrl" :alt="podcast.title" class="w-full h-auto aspect-square object-cover" />
+                <img v-if="imageUrl" :src="imageUrl" :alt="podcast.title"
+                    class="w-full h-auto aspect-square object-cover" />
                 <div v-else class="w-full aspect-square bg-secondary flex items-center justify-center">
                     <Podcast class="w-16 h-16 text-muted-foreground" />
                 </div>
@@ -90,18 +100,10 @@ const podcastDataForStatus = computed(() => ({
 
                 <!-- Actions -->
                 <div class="flex items-center gap-4 py-4">
-                    <ListenStatusButton 
-                        :external-id="podcastExternalId" 
-                        :podcast-data="podcastDataForStatus"
-                    />
-                    
-                    <a 
-                        v-if="podcast.website" 
-                        :href="podcast.website" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm font-medium transition-colors"
-                    >
+                    <ListenStatusButton :external-id="podcastExternalId" :podcast-data="podcastDataForStatus" />
+
+                    <a v-if="podcast.website" :href="podcast.website" target="_blank" rel="noopener noreferrer"
+                        class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm font-medium transition-colors">
                         <ExternalLink class="w-4 h-4" />
                         Website
                     </a>

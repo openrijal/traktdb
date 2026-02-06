@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
 import { createAuth } from '@/lib/auth';
 import { createDb } from '@/lib/db';
-import { mediaItems, userProgress, books, userBookProgress, podcasts, userPodcastProgress } from 'drizzle/schema';
+import { mediaItems, userProgress, books, userBookProgress, podcasts, podcastEpisodes, userPodcastProgress } from 'drizzle/schema';
 import { and, eq, desc } from 'drizzle-orm';
 import { MediaType } from '@/lib/constants';
 
@@ -110,7 +110,10 @@ export const GET: APIRoute = async ({ request, locals }) => {
                 .orderBy(desc(userPodcastProgress.updatedAt));
 
             items = raw.map((i) => ({
-                collectionId: parseInt(i.podcast.itunesId),
+                id: i.podcast.listenNotesId || i.podcast.itunesId || i.podcast.id.toString(), // Prefer external ID, fallback to DB ID
+                listenNotesId: i.podcast.listenNotesId,
+                itunesId: i.podcast.itunesId ? parseInt(i.podcast.itunesId) : undefined,
+                collectionId: i.podcast.itunesId ? parseInt(i.podcast.itunesId) : i.podcast.id, // Fallback for components strictly needing collectionId but better to use id
                 collectionName: i.podcast.collectionName,
                 artistName: i.podcast.artistName,
                 artworkUrl600: i.podcast.artworkUrl || undefined,

@@ -10,7 +10,8 @@
     "astro": "astro",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "test": "vitest"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.6",
@@ -36,6 +37,7 @@
     "pinia-plugin-persistedstate": "^4.7.1",
     "postgres": "^3.4.8",
     "radix-vue": "^1.9.17",
+    "rss-parser": "^3.13.0",
     "tailwind-merge": "^3.4.0",
     "tailwindcss": "^4.1.18",
     "typescript": "^5.9.3",
@@ -43,12 +45,16 @@
   },
   "packageManager": "pnpm@10.22.0+sha512.bf049efe995b28f527fd2b41ae0474ce29186f7edcb3bf545087bd61fbbebb2bf75362d1307fda09c2d288e1e499787ac12d4fcb617a974718a6051f2eee741c",
   "devDependencies": {
+    "@eslint/js": "^9.39.2",
     "@types/date-fns": "^2.6.3",
     "@vitest/ui": "^4.0.16",
     "@vue/test-utils": "^2.4.6",
     "dotenv": "^17.2.3",
     "drizzle-kit": "^0.31.8",
+    "eslint-plugin-vue": "^10.7.0",
+    "globals": "^17.3.0",
     "happy-dom": "^20.1.0",
+    "typescript-eslint": "^8.54.0",
     "vitest": "^4.0.16",
     "wrangler": "^4.58.0"
   }

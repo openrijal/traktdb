@@ -17,7 +17,7 @@ const props = defineProps({
             image?: string | null;
             description?: string | null;
             listenNotesId?: string;
-            itunesId?: number;
+            itunesId?: number | string;
         }>,
         default: null
     }
@@ -68,35 +68,22 @@ const toggleMenu = () => {
 
 <template>
     <div ref="menuRef" class="relative">
-        <Button
-            @click="toggleMenu"
-            :variant="currentStatus ? 'secondary' : 'default'"
-            class="gap-2"
-        >
+        <Button @click="toggleMenu" :variant="currentStatus ? 'secondary' : 'default'" class="gap-2">
             <component :is="currentIcon" class="w-4 h-4" />
             {{ currentStatusLabel }}
             <ChevronDown class="w-4 h-4 ml-1 opacity-50" :class="{ 'rotate-180': isOpen }" />
         </Button>
-        
-        <div 
-            v-if="isOpen"
-            class="absolute top-full left-0 mt-2 w-48 bg-card border border-border rounded-lg shadow-md z-50 overflow-hidden"
-        >
-            <button
-                v-for="option in statusOptions"
-                :key="option.value"
-                @click="handleStatusChange(option.value)"
+
+        <div v-if="isOpen"
+            class="absolute top-full left-0 mt-2 w-48 bg-card border border-border rounded-lg shadow-md z-50 overflow-hidden">
+            <button v-for="option in statusOptions" :key="option.value" @click="handleStatusChange(option.value)"
                 class="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-left hover:bg-secondary transition-colors"
-                :class="{ 'bg-secondary text-primary': currentStatus === option.value }"
-            >
+                :class="{ 'bg-secondary text-primary': currentStatus === option.value }">
                 <component :is="option.icon" class="w-4 h-4" />
                 {{ option.label }}
             </button>
-            <button
-                v-if="currentStatus"
-                @click="handleStatusChange(null)"
-                class="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-left text-red-400 hover:bg-secondary transition-colors border-t border-border"
-            >
+            <button v-if="currentStatus" @click="handleStatusChange(null)"
+                class="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-left text-red-400 hover:bg-secondary transition-colors border-t border-border">
                 <X class="w-4 h-4" />
                 Remove from Library
             </button>

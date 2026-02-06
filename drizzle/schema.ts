@@ -131,7 +131,7 @@ export const books = pgTable('books', {
     publishedDate: text('published_date'),
     pageCount: integer('page_count'),
     categories: text('categories').array(),
-    averageRating: integer('average_rating'), 
+    averageRating: integer('average_rating'),
     ratingsCount: integer('ratings_count'),
     isEbook: boolean('is_ebook').default(false),
     createdAt: timestamp('created_at').defaultNow().notNull(),
@@ -150,9 +150,28 @@ export const podcasts = pgTable('podcasts', {
     totalEpisodes: integer('total_episodes'),
     listenScore: integer('listen_score'),
     genres: text('genres').array(),
+    lastRefreshedAt: timestamp('last_refreshed_at'),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
+
+export const podcastEpisodes = pgTable('podcast_episodes', {
+    id: serial('id').primaryKey(),
+    podcastId: integer('podcast_id').notNull().references(() => podcasts.id, { onDelete: 'cascade' }),
+    guid: text('guid').notNull(),
+    title: text('title').notNull(),
+    description: text('description'),
+    pubDate: timestamp('pub_date'),
+    duration: text('duration'), // Can be string "MM:SS" or seconds integer, keeping flexible
+    audioUrl: text('audio_url'),
+    enclosureLength: integer('enclosure_length'),
+    episodeNumber: integer('episode_number'),
+    seasonNumber: integer('season_number'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}, (t) => ({
+    unq: uniqueIndex('podcast_episodes_guid_podcast_unique').on(t.guid, t.podcastId),
+}));
 
 export const userPodcastProgress = pgTable('user_podcast_progress', {
     id: serial('id').primaryKey(),
@@ -214,4 +233,17 @@ export const episodeProgress = pgTable('episode_progress', {
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
 }, (t) => ({
     unq: uniqueIndex('episode_progress_user_episode_unique').on(t.userId, t.episodeId),
+}));
+
+export const userPodcastEpisodeProgress = pgTable('user_podcast_episode_progress', {
+    id: serial('id').primaryKey(),
+    userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+    episodeId: integer('episode_id').notNull().references(() => podcastEpisodes.id, { onDelete: 'cascade' }),
+    status: text('status').notNull(), // 'listened', 'listening' (in progress)
+    progressSeconds: integer('progress_seconds').default(0), // progress in seconds
+    isListened: boolean('is_listened').default(false).notNull(), // completed
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+}, (t) => ({
+    unq: uniqueIndex('user_podcast_episode_progress_unique').on(t.userId, t.episodeId),
 }));
