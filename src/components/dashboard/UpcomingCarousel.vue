@@ -95,16 +95,15 @@ function formatDate(dateStr: string) {
 
 <template>
     <div class="space-y-4">
-        <h2 class="text-2xl font-semibold tracking-tight">Upcoming Schedule</h2>
-
         <div v-if="loading" class="flex gap-4 overflow-hidden">
             <!-- Skeletons -->
             <div v-for="i in 4" :key="i" class="w-[140px] h-[210px] bg-muted animate-pulse rounded-lg shrink-0"></div>
         </div>
 
         <div v-else-if="groups.length === 0"
-            class="text-muted-foreground text-sm h-32 flex items-center border border-dashed rounded-lg justify-center">
-            No upcoming releases found.
+            class="py-8 text-center bg-muted/30 rounded-lg border border-border/50 border-dashed">
+            <Calendar class="mx-auto h-8 w-8 text-muted-foreground/50 mb-3" />
+            <p class="text-muted-foreground text-sm">No upcoming releases found.</p>
         </div>
 
         <div v-else class="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x">
