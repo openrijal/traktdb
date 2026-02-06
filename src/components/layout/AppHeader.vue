@@ -8,7 +8,7 @@ const props = defineProps<{ user?: { name?: string | null; image?: string | null
 </script>
 
 <template>
-    <header class="flex h-14 items-center gap-4 bg-background px-6 justify-between">
+    <header class="flex h-14 items-center gap-4 bg-background px-6 justify-between border-b border-border/50">
         <div class="flex-1">
         </div>
         <div class="flex items-center gap-4">
