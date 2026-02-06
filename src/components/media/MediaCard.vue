@@ -3,7 +3,8 @@ import { computed, ref } from 'vue';
 import { Star } from 'lucide-vue-next';
 import WatchStatusButton from './WatchStatusButton.vue';
 import { Card, CardContent } from '@/components/ui/card';
-import { TMDB_IMAGE_BASE_URL, PLACEHOLDER_IMAGE_URL, MediaType } from '@/lib/constants';
+import { MediaType } from '@/lib/constants';
+import { getTmdbImageUrl } from '@/lib/images';
 import { useLibraryStore } from '@/stores/library';
 
 const props = defineProps<{
@@ -25,11 +26,7 @@ const props = defineProps<{
 const imageLoaded = ref(false);
 const imageError = ref(false);
 
-const posterUrl = computed(() =>
-    props.media.poster_path
-        ? `${TMDB_IMAGE_BASE_URL}${props.media.poster_path}`
-        : PLACEHOLDER_IMAGE_URL
-);
+const posterUrl = computed(() => getTmdbImageUrl(props.media.poster_path));
 
 const displayTitle = computed(() => props.media.title || props.media.name || 'Unknown');
 
@@ -84,9 +81,10 @@ const onImageError = () => {
                     <span class="text-xs text-muted-foreground/40">No Image</span>
                 </div>
                 
-                <img 
+                <img
                     v-show="imageLoaded && !imageError"
-                    :src="posterUrl" 
+                    v-if="posterUrl"
+                    :src="posterUrl"
                     :alt="displayTitle"
                     class="w-full h-full object-cover motion-safe:transition-transform motion-safe:duration-500 motion-safe:group-hover:scale-105"
                     loading="lazy"
