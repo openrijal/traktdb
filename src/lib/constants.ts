@@ -60,7 +60,8 @@ export const LibraryTabs = {
 
 export const TMDB_API_URL = 'https://api.themoviedb.org/3';
 export const TMDB_IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
-export const PLACEHOLDER_IMAGE_URL = 'https://via.placeholder.com/500x750?text=No+Image'; // Fallback
+// Inline SVG fallback – no external dependency, renders instantly
+export const PLACEHOLDER_IMAGE_URL = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='500' height='750' fill='%23374151'%3E%3Crect width='500' height='750' fill='%231f2937'/%3E%3Ctext x='250' y='375' text-anchor='middle' dominant-baseline='middle' font-family='system-ui,sans-serif' font-size='20' fill='%236b7280'%3ENo Image%3C/text%3E%3C/svg%3E";
 
 
 export const LibraryUI = {

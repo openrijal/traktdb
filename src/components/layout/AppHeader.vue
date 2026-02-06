@@ -1,18 +1,18 @@
 <script setup lang="ts">
 import { UserCircle } from 'lucide-vue-next';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import GlobalSearch from '@/components/search/GlobalSearch.vue';
+import OmniSearch from '@/components/search/OmniSearch.vue';
 import ThemeToggle from '@/components/ui/ThemeToggle.vue';
 
 const props = defineProps<{ user?: { name?: string | null; image?: string | null; email?: string; }; }>();
 </script>
 
 <template>
-    <header class="flex h-14 items-center gap-4 bg-background px-6 justify-between">
-        <div class="flex-1">
+    <header class="flex h-14 items-center gap-4 bg-background px-6">
+        <div class="flex-1 flex justify-center">
+            <OmniSearch />
         </div>
-        <div class="flex items-center gap-4">
-            <GlobalSearch />
+        <div class="flex items-center gap-4 flex-shrink-0">
             <ThemeToggle />
             <div class="flex items-center gap-2">
                 <span class="text-sm font-medium hidden md:block">{{ props.user?.name || 'User' }}</span>
