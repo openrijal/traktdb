@@ -34,9 +34,9 @@ async function fetchCalendar(force = false) {
       throw new Error('Failed to fetch calendar');
     }
     const json = await response.json();
-    if (json.success && json.data?.days) {
-      items.value = json.data.days;
-      setCalendarCache(json.data.days);
+    if (json.success && json.data) {
+      items.value = json.data;
+      setCalendarCache(json.data);
     } else {
       items.value = [];
     }

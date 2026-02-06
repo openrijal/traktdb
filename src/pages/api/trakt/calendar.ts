@@ -27,7 +27,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
         }
 
         const normalizedShows = (shows || []).map((item: any) => ({
-            type: 'episode',
+            type: 'show',
             date: item.first_aired,
             title: item.show.title,
             episodeTitle: item.episode.title,
@@ -65,7 +65,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
             new Date(a.date).getTime() - new Date(b.date).getTime()
         );
 
-        return new Response(JSON.stringify(combined), { status: 200 });
+        return new Response(JSON.stringify({ success: true, data: combined }), { status: 200 });
 
     } catch (error) {
         console.error('Trakt calendar error:', error);

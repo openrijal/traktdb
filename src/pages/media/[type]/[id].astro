@@ -1,6 +1,7 @@
 ---
 import AppLayout from "@/layouts/AppLayout.astro";
 import MediaHeader from "@/components/media/MediaHeader.vue";
+import NextEpisodeBanner from "@/components/media/NextEpisodeBanner.vue";
 import SeasonsList from "@/components/media/SeasonsList.vue";
 import { Button } from "@/components/ui/button";
 import { MediaType } from "@/lib/constants";
@@ -51,6 +52,10 @@ try {
             ) : mediaItem ? (
                 <>
                     <MediaHeader client:load media={mediaItem} />
+
+                    {type === MediaType.TV && (
+                        <NextEpisodeBanner client:load tmdbId={mediaItem.id} />
+                    )}
 
                     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                         {type === MediaType.TV && mediaItem.seasons && mediaItem.seasons.length > 0 && (
