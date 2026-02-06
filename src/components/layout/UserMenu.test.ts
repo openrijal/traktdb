@@ -71,9 +71,9 @@ describe('UserMenu', () => {
         const wrapper = mount(UserMenu, {
             props: {
                 user: {
-                    name: 'John Doe',
+                    name: 'James Bond',
                     image: 'https://example.com/avatar.jpg',
-                    email: 'john@example.com',
+                    email: 'james@example.com',
                 },
             },
         });
@@ -87,25 +87,25 @@ describe('UserMenu', () => {
         const wrapper = mount(UserMenu, {
             props: {
                 user: {
-                    name: 'John Doe',
+                    name: 'James Bond',
                     image: null,
-                    email: 'john@example.com',
+                    email: 'james@example.com',
                 },
             },
         });
 
         const fallback = wrapper.find('[data-testid="avatar-fallback"]');
         expect(fallback.exists()).toBe(true);
-        expect(fallback.text()).toContain('JD');
+        expect(fallback.text()).toContain('JB');
     });
 
     it('renders single initial for single-word name', () => {
         const wrapper = mount(UserMenu, {
             props: {
                 user: {
-                    name: 'John',
+                    name: 'James',
                     image: null,
-                    email: 'john@example.com',
+                    email: 'james@example.com',
                 },
             },
         });
@@ -140,16 +140,16 @@ describe('UserMenu', () => {
         const wrapper = mount(UserMenu, {
             props: {
                 user: {
-                    name: 'Jane Smith',
+                    name: 'Lara Kroft',
                     image: null,
-                    email: 'jane@example.com',
+                    email: 'lara@example.com',
                 },
             },
         });
 
         const label = wrapper.find('[data-testid="dropdown-label"]');
-        expect(label.text()).toContain('Jane Smith');
-        expect(label.text()).toContain('jane@example.com');
+        expect(label.text()).toContain('Lara Kroft');
+        expect(label.text()).toContain('lara@example.com');
     });
 
     it('displays "User" when name is null', () => {
@@ -170,7 +170,7 @@ describe('UserMenu', () => {
     it('contains Profile menu item', () => {
         const wrapper = mount(UserMenu, {
             props: {
-                user: { name: 'Test', image: null, email: 'test@test.com' },
+                user: { name: 'James Bond', image: null, email: 'james@example.com' },
             },
         });
 
@@ -182,7 +182,7 @@ describe('UserMenu', () => {
     it('contains Settings menu item', () => {
         const wrapper = mount(UserMenu, {
             props: {
-                user: { name: 'Test', image: null, email: 'test@test.com' },
+                user: { name: 'James Bond', image: null, email: 'james@example.com' },
             },
         });
 
@@ -194,7 +194,7 @@ describe('UserMenu', () => {
     it('contains Log out menu item', () => {
         const wrapper = mount(UserMenu, {
             props: {
-                user: { name: 'Test', image: null, email: 'test@test.com' },
+                user: { name: 'James Bond', image: null, email: 'james@example.com' },
             },
         });
 
@@ -206,7 +206,7 @@ describe('UserMenu', () => {
     it('calls signOut when Log out is clicked', async () => {
         const wrapper = mount(UserMenu, {
             props: {
-                user: { name: 'Test', image: null, email: 'test@test.com' },
+                user: { name: 'James Bond', image: null, email: 'james@example.com' },
             },
         });
 
@@ -221,7 +221,7 @@ describe('UserMenu', () => {
     it('has accessible trigger button with aria-label', () => {
         const wrapper = mount(UserMenu, {
             props: {
-                user: { name: 'Test', image: null, email: 'test@test.com' },
+                user: { name: 'James Bond', image: null, email: 'james@example.com' },
             },
         });
 
@@ -233,21 +233,21 @@ describe('UserMenu', () => {
         const wrapper = mount(UserMenu, {
             props: {
                 user: {
-                    name: 'John Michael Doe',
+                    name: 'James Bond Double7',
                     image: null,
-                    email: 'jmd@example.com',
+                    email: '007@example.com',
                 },
             },
         });
 
         const fallback = wrapper.find('[data-testid="avatar-fallback"]');
-        expect(fallback.text()).toContain('JM');
+        expect(fallback.text()).toContain('JB');
     });
 
     it('renders separators between menu sections', () => {
         const wrapper = mount(UserMenu, {
             props: {
-                user: { name: 'Test', image: null, email: 'test@test.com' },
+                user: { name: 'James Bond', image: null, email: 'james@example.com' },
             },
         });
 
