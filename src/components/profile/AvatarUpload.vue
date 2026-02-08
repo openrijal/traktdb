@@ -5,6 +5,9 @@ import { Loader2, Camera as CameraIcon } from 'lucide-vue-next';
 import { ref } from 'vue';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+
+const props = defineProps<{ class?: string }>();
 
 const authStore = useAuthStore();
 const uploading = ref(false);
@@ -32,7 +35,7 @@ const takePhoto = async () => {
 </script>
 
 <template>
-  <div class="flex flex-col items-center gap-4">
+  <div :class="cn('flex flex-col items-center gap-4', props.class)">
     <Avatar class="h-24 w-24">
       <AvatarImage v-if="authStore.user?.image" :src="authStore.user.image" :alt="authStore.user.name || 'Avatar'" />
       <AvatarFallback class="text-2xl font-bold bg-secondary text-secondary-foreground">
