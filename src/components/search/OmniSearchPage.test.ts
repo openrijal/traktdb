@@ -114,9 +114,14 @@ describe('OmniSearchPage', () => {
             writable: true,
         });
 
-        vi.spyOn(global, 'fetch').mockResolvedValueOnce({
+        vi.spyOn(global, 'fetch')
+            .mockResolvedValueOnce({
             ok: true,
             json: () => Promise.resolve(mockOmniResponse),
+        } as Response)
+            .mockResolvedValueOnce({
+            ok: true,
+            json: () => Promise.resolve({ results: [] }),
         } as Response);
 
         const wrapper = mount(OmniSearchPage);
@@ -126,6 +131,9 @@ describe('OmniSearchPage', () => {
 
         expect(global.fetch).toHaveBeenCalledWith(
             expect.stringContaining('/api/search/omni?q=batman'),
+        );
+        expect(global.fetch).toHaveBeenCalledWith(
+            expect.stringContaining('/api/search/multi?q=batman&page=1'),
         );
     });
 });

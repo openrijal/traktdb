@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import { Headphones, Podcast, ExternalLink, ArrowLeft } from 'lucide-vue-next';
 import ListenStatusButton from './ListenStatusButton.vue';
+import { getPodcastArtwork } from '@/lib/images';
 
 const props = defineProps<{
     podcast: {
@@ -22,7 +23,10 @@ const props = defineProps<{
 }>();
 
 const imageUrl = computed(() =>
-    props.podcast.image || props.podcast.thumbnail || null
+    getPodcastArtwork({
+        artworkUrl600: props.podcast.image || undefined,
+        artworkUrl100: props.podcast.thumbnail || undefined,
+    })
 );
 
 const podcastExternalId = computed(() =>

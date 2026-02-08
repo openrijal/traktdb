@@ -158,7 +158,8 @@ const convertBooks = (items: OmniResult[]) =>
 
 const convertPodcasts = (items: OmniResult[]) =>
     items.map((item) => ({
-        collectionId: Number(item.id),
+        id: String(item.id),
+        collectionId: item.id,
         collectionName: item.title,
         artistName: item.subtitle || '',
         artworkUrl600: item.image || undefined,
@@ -182,10 +183,10 @@ const fetchCategoryPage = async (category: TabKey) => {
                 url = `/api/search/multi?q=${q}&page=${page}`;
                 break;
             case 'books':
-                url = `/api/search/omni?q=${q}&limit=${PER_PAGE}`;
+                url = `/api/books/search?q=${q}&startIndex=${(page - 1) * PER_PAGE}`;
                 break;
             case 'podcasts':
-                url = `/api/search/omni?q=${q}&limit=${PER_PAGE}`;
+                url = `/api/podcasts/search?q=${q}&limit=${page * PER_PAGE}`;
                 break;
         }
 
@@ -221,33 +222,46 @@ const fetchCategoryPage = async (category: TabKey) => {
                 break;
             }
             case 'books': {
-                const books = (data.books || []).map((item: any) => ({
+                const books = (data.items || []).map((item: any) => ({
                     id: String(item.id),
-                    volumeInfo: {
-                        title: item.title,
-                        authors: item.subtitle ? [item.subtitle] : [],
-                        imageLinks: item.image
-                            ? { thumbnail: item.image }
-                            : undefined,
-                        publishedDate: item.year
-                            ? `${item.year}-01-01`
-                            : undefined,
-                        averageRating: item.rating,
-                    },
+                    volumeInfo: item.volumeInfo,
                 }));
-                categoryResults.value.books = books;
-                categoryHasMore.value.books = false;
+                if (page === 1) {
+                    categoryResults.value.books = books;
+                } else {
+                    categoryResults.value.books = [
+                        ...categoryResults.value.books,
+                        ...books,
+                    ];
+                }
+                const total = data.totalItems || 0;
+                categoryHasMore.value.books = total
+                    ? categoryResults.value.books.length < total
+                    : books.length >= PER_PAGE;
                 break;
             }
             case 'podcasts': {
-                const podcasts = (data.podcasts || []).map((item: any) => ({
-                    collectionId: Number(item.id),
+                const podcasts = (data.results || []).map((item: any) => ({
+                    id: item.id,
+                    collectionId: item.itunesId || item.id,
                     collectionName: item.title,
-                    artistName: item.subtitle || '',
-                    artworkUrl600: item.image || undefined,
+                    artistName: item.publisher || '',
+                    artworkUrl600: item.image || item.thumbnail || undefined,
                 }));
-                categoryResults.value.podcasts = podcasts;
-                categoryHasMore.value.podcasts = false;
+                if (page === 1) {
+                    categoryResults.value.podcasts = podcasts;
+                } else {
+                    const prev = categoryResults.value.podcasts.length;
+                    const nextItems = podcasts.slice(prev);
+                    categoryResults.value.podcasts = [
+                        ...categoryResults.value.podcasts,
+                        ...nextItems,
+                    ];
+                }
+                const total = data.total || 0;
+                categoryHasMore.value.podcasts = total
+                    ? categoryResults.value.podcasts.length < total
+                    : podcasts.length >= page * PER_PAGE;
                 break;
             }
         }
@@ -267,8 +281,8 @@ const switchTab = (tab: TabKey) => {
     currentTab.value = tab;
     syncUrl();
 
-    // If we don't have results for this category yet and have a query, fetch
-    if (tab !== 'all' && categoryResults.value[tab].length === 0 && query.value.length >= 2) {
+    // Always fetch per-category data when switching to a specific tab
+    if (tab !== 'all' && query.value.length >= 2) {
         categoryPage.value[tab] = 1;
         fetchCategoryPage(tab);
     }
@@ -292,6 +306,10 @@ const syncUrl = () => {
 const debouncedSearch = useDebounceFn(() => {
     syncUrl();
     performOmniSearch();
+    if (currentTab.value !== 'all' && query.value.length >= 2) {
+        categoryPage.value[currentTab.value] = 1;
+        fetchCategoryPage(currentTab.value);
+    }
 }, 300);
 
 const handleInput = () => {
@@ -361,6 +379,10 @@ onMounted(() => {
 
     if (query.value.length >= 2) {
         performOmniSearch();
+        if (currentTab.value !== 'all') {
+            categoryPage.value[currentTab.value] = 1;
+            fetchCategoryPage(currentTab.value);
+        }
     }
 });
 </script>
@@ -560,8 +582,7 @@ onMounted(() => {
                 v-if="
                     !categoryLoading[currentTab] &&
                     categoryHasMore[currentTab] &&
-                    categoryResults[currentTab].length > 0 &&
-                    (currentTab === 'movies' || currentTab === 'tv')
+                    categoryResults[currentTab].length > 0
                 "
                 class="flex justify-center pt-4"
             >
