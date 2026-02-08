@@ -17,32 +17,31 @@ const getSystemTheme = (): 'light' | 'dark' => {
 
 const applyTheme = (theme: Theme) => {
   const html = document.documentElement;
-  
+
   if (theme === 'system') {
     resolvedTheme.value = getSystemTheme();
   } else {
     resolvedTheme.value = theme;
   }
-  
+
   html.classList.remove('light', 'dark');
   html.classList.add(resolvedTheme.value);
   html.setAttribute('data-theme', resolvedTheme.value);
 };
 
 const toggleTheme = () => {
-  const themes: Theme[] = ['light', 'dark', 'system'];
-  const currentIndex = themes.indexOf(currentTheme.value);
-  currentTheme.value = themes[(currentIndex + 1) % themes.length];
-  
-  localStorage.setItem('theme', currentTheme.value);
-  applyTheme(currentTheme.value);
+  const newTheme = resolvedTheme.value === 'dark' ? 'light' : 'dark';
+  currentTheme.value = newTheme;
+
+  localStorage.setItem('theme', newTheme);
+  applyTheme(newTheme);
 };
 
 onMounted(() => {
   const saved = localStorage.getItem('theme') as Theme | null;
   currentTheme.value = saved || 'system';
   applyTheme(currentTheme.value);
-  
+
   if (typeof window !== 'undefined' && window.matchMedia) {
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
       if (currentTheme.value === 'system') {
@@ -58,13 +57,8 @@ watch(currentTheme, (newTheme) => {
 </script>
 
 <template>
-  <Button
-    variant="ghost"
-    size="icon"
-    @click="toggleTheme"
-    :title="`Current: ${currentTheme}. Click to toggle.`"
-    class="h-9 w-9"
-  >
+  <Button variant="ghost" size="icon" @click="toggleTheme" :title="`Current: ${currentTheme}. Click to toggle.`"
+    class="h-9 w-9">
     <Sun v-if="resolvedTheme === 'light'" class="h-4 w-4" />
     <Moon v-else class="h-4 w-4" />
     <span class="sr-only">Toggle theme</span>

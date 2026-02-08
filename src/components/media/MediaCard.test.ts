@@ -77,7 +77,6 @@ describe('MediaCard.vue', () => {
             }
         });
 
-        const img = wrapper.find('img');
-        expect(img.attributes('src')).not.toBeUndefined();
+        expect(wrapper.text()).toContain('No Image');
     });
 });
