@@ -22,8 +22,14 @@ vi.mock('lucide-vue-next', () => ({
 // Mock Input component
 vi.mock('@/components/ui/input', () => ({
     Input: {
-        template: '<input v-bind="$attrs" />',
-        inheritAttrs: true,
+        template: '<input :value="modelValue" v-bind="$attrs" @input="onInput" />',
+        props: ['modelValue'],
+        emits: ['update:modelValue'],
+        methods: {
+            onInput(event: Event) {
+                this.$emit('update:modelValue', (event.target as HTMLInputElement).value);
+            },
+        },
     },
 }));
 
