@@ -1,15 +1,26 @@
 <script setup lang="ts">
 import { authClient } from '@/lib/auth-client';
 import { useAuthStore } from '@/stores/auth';
-import { ref } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { Loader2 } from 'lucide-vue-next';
 import AvatarUpload from './AvatarUpload.vue';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
+const props = defineProps<{
+  initialUser?: {
+    name?: string | null;
+    email?: string | null;
+    image?: string | null;
+  };
+}>();
+
 const authStore = useAuthStore();
 const loading = ref(false);
-const name = ref(authStore.user?.name || '');
+if (!authStore.user && props.initialUser) {
+  authStore.user = props.initialUser as any;
+}
+const name = ref(props.initialUser?.name || authStore.user?.name || '');
 
 const updateProfile = async () => {
   loading.value = true;
@@ -25,6 +36,22 @@ const updateProfile = async () => {
     loading.value = false;
   }
 };
+
+onMounted(async () => {
+  if (!authStore.user) {
+    await authStore.fetchSession();
+  }
+});
+
+watch(
+  () => authStore.user,
+  (user) => {
+    if (user?.name && !name.value) {
+      name.value = user.name;
+    }
+  },
+  { immediate: true },
+);
 </script>
 
 <template>
@@ -44,7 +71,7 @@ const updateProfile = async () => {
           class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
           Email
         </label>
-        <Input id="email" :model-value="authStore.user?.email" disabled />
+        <Input id="email" :model-value="authStore.user?.email || props.initialUser?.email" disabled />
       </div>
     </div>
 
