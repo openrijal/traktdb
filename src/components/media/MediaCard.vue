@@ -80,7 +80,7 @@ const linkPath = computed(() => {
                 <div v-if="!imageLoaded" class="absolute inset-0 bg-muted animate-pulse" />
 
                 <!-- Image Fallback Placeholder -->
-                <div v-if="imageError"
+                <div v-if="imageError || !posterUrl"
                     class="absolute inset-0 bg-muted flex flex-col items-center justify-center gap-2">
                     <svg class="w-10 h-10 text-muted-foreground/40" fill="none" stroke="currentColor"
                         viewBox="0 0 24 24">

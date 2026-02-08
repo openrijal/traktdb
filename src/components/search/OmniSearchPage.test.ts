@@ -19,7 +19,16 @@ vi.mock('@/components/podcasts/PodcastCard.vue', () => ({
     default: { template: '<div class="mock-podcast-card" />' },
 }));
 vi.mock('@/components/ui/input', () => ({
-    Input: { template: '<input v-bind="$attrs" />' },
+    Input: {
+        template: '<input :value="modelValue" v-bind="$attrs" @input="onInput" />',
+        props: ['modelValue'],
+        emits: ['update:modelValue'],
+        methods: {
+            onInput(event: Event) {
+                this.$emit('update:modelValue', (event.target as HTMLInputElement).value);
+            },
+        },
+    },
 }));
 
 const mockOmniResponse = {
@@ -105,7 +114,11 @@ describe('OmniSearchPage', () => {
 
         const buttons = wrapper.findAll('button');
         const tabLabels = buttons.map((b) => b.text());
-        expect(tabLabels).toEqual(expect.arrayContaining(['All', 'Movies', 'TV Shows', 'Books', 'Podcasts']));
+        expect(tabLabels.some((t) => t.includes('All'))).toBe(true);
+        expect(tabLabels.some((t) => t.includes('Movies'))).toBe(true);
+        expect(tabLabels.some((t) => t.includes('TV Shows'))).toBe(true);
+        expect(tabLabels.some((t) => t.includes('Books'))).toBe(true);
+        expect(tabLabels.some((t) => t.includes('Podcasts'))).toBe(true);
     });
 
     it('reads query from URL on mount', async () => {

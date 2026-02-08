@@ -9,7 +9,7 @@ const props = defineProps<{ user?: { name?: string | null; image?: string | null
 
 <template>
     <header
-        class="flex h-16 items-center gap-4 bg-background/80 px-6 justify-between border-b border-border/40 backdrop-blur"
+        class="flex h-16 items-center gap-4 bg-background/80 px-6 justify-between border-b border-border/50 backdrop-blur"
     >
         <div class="flex flex-1 justify-center">
             <div class="w-full max-w-2xl">
