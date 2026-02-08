@@ -3,7 +3,8 @@ import { computed } from 'vue';
 import { Star, Calendar, Info } from 'lucide-vue-next';
 import WatchStatusButton from './WatchStatusButton.vue';
 
-import { TMDB_IMAGE_BASE_URL, MediaType } from '@/lib/constants';
+import { MediaType, PLACEHOLDER_IMAGE_URL } from '@/lib/constants';
+import { getTmdbImageUrl } from '@/lib/images';
 
 const props = defineProps<{
     media: {
@@ -22,15 +23,11 @@ const props = defineProps<{
 }>();
 
 const backdropUrl = computed(() =>
-    props.media.backdrop_path
-        ? `https://image.tmdb.org/t/p/w1920_and_h800_multi_faces${props.media.backdrop_path}`
-        : null
+    getTmdbImageUrl(props.media.backdrop_path, 'backdrop')
 );
 
 const posterUrl = computed(() =>
-    props.media.poster_path
-        ? `https://image.tmdb.org/t/p/w500${props.media.poster_path}`
-        : 'https://placehold.co/500x750?text=No+Image'
+    getTmdbImageUrl(props.media.poster_path) || PLACEHOLDER_IMAGE_URL
 );
 
 const year = computed(() => {

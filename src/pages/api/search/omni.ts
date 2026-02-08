@@ -4,7 +4,7 @@ import { createGoogleBooks } from '@/lib/google-books';
 import { createListenNotes } from '@/lib/listennotes';
 import { createITunes } from '@/lib/itunes';
 import { MediaType } from '@/lib/constants';
-import { getTmdbImageUrl, getBookThumbnail, getPodcastArtwork, ensureHttps } from '@/lib/images';
+import { getTmdbImageUrl, getBookThumbnail, getPodcastArtwork } from '@/lib/images';
 
 interface OmniResult {
     id: string | number;
