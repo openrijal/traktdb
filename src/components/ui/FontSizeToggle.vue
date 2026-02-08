@@ -7,8 +7,8 @@ type FontSize = 'small' | 'medium' | 'large';
 const STORAGE_KEY = 'font-size';
 const SIZE_TO_PX: Record<FontSize, string> = {
     small: '16px',
-    medium: '17px',
-    large: '18px',
+    medium: '18px',
+    large: '20px',
 };
 
 const currentSize = ref<FontSize>('small');

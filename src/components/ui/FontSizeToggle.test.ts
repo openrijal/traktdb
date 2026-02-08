@@ -34,6 +34,6 @@ describe('FontSizeToggle', () => {
 
         expect(store['font-size']).toBe('medium');
         expect(document.documentElement.getAttribute('data-font-size')).toBe('medium');
-        expect(document.documentElement.style.fontSize).toBe('17px');
+        expect(document.documentElement.style.fontSize).toBe('18px');
     });
 });
