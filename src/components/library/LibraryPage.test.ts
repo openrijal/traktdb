@@ -35,7 +35,7 @@ describe('LibraryPage', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         Object.defineProperty(window, 'location', {
-            value: { search: '', href: `${getTestHost()}/library` },
+            value: { search: '', href: `${getTestHost()}/library/movies`, pathname: '/library/movies' },
             writable: true,
         });
         vi.spyOn(window.history, 'replaceState').mockImplementation(() => { });
@@ -50,7 +50,7 @@ describe('LibraryPage', () => {
         const wrapper = mount(LibraryPage);
         const text = wrapper.text();
         expect(text).toContain('Movies');
-        expect(text).toContain('Series');
+        expect(text).toContain('Shows');
         expect(text).toContain('Books');
         expect(text).toContain('E-Books');
         expect(text).toContain('Podcasts');
@@ -124,7 +124,7 @@ describe('LibraryPage', () => {
 
     it('reads type/status from URL params on mount', async () => {
         Object.defineProperty(window, 'location', {
-            value: { search: '?type=book&status=reading', href: `${getTestHost()}/library?type=book&status=reading` },
+            value: { search: '?status=reading', href: `${getTestHost()}/library/books?status=reading`, pathname: '/library/books' },
             writable: true,
         });
 

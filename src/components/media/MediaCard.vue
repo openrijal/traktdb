@@ -21,6 +21,7 @@ const props = defineProps<{
         lastAirDate?: string;
     };
     type?: MediaType; // explicit type override if media_type missing
+    linkPrefix?: string;
 }>();
 
 const imageLoaded = ref(false);
@@ -61,10 +62,15 @@ const onImageError = () => {
     imageError.value = true;
     imageLoaded.value = true;
 };
+
+const linkPath = computed(() => {
+    const prefix = props.linkPrefix || '/media';
+    return `${prefix}/${mediaType.value}/${props.media.id}`;
+});
 </script>
 
 <template>
-    <a :href="`/media/${mediaType}/${props.media.id}`" class="group block relative no-underline">
+    <a :href="linkPath" class="group block relative no-underline">
         <Card
             class="overflow-hidden border-0 bg-card shadow-md motion-safe:transition-all motion-safe:duration-300 motion-safe:hover:-translate-y-1 hover:shadow-lg h-full">
 
@@ -72,25 +78,21 @@ const onImageError = () => {
             <div class="aspect-[2/3] w-full relative overflow-hidden bg-muted">
                 <!-- Skeleton Loading State -->
                 <div v-if="!imageLoaded" class="absolute inset-0 bg-muted animate-pulse" />
-                
+
                 <!-- Image Fallback Placeholder -->
-                <div v-if="imageError" class="absolute inset-0 bg-muted flex flex-col items-center justify-center gap-2">
-                    <svg class="w-10 h-10 text-muted-foreground/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                <div v-if="imageError"
+                    class="absolute inset-0 bg-muted flex flex-col items-center justify-center gap-2">
+                    <svg class="w-10 h-10 text-muted-foreground/40" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                     <span class="text-xs text-muted-foreground/40">No Image</span>
                 </div>
-                
-                <img
-                    v-show="imageLoaded && !imageError"
-                    v-if="posterUrl"
-                    :src="posterUrl"
-                    :alt="displayTitle"
+
+                <img v-show="imageLoaded && !imageError" v-if="posterUrl" :src="posterUrl" :alt="displayTitle"
                     class="w-full h-full object-cover motion-safe:transition-transform motion-safe:duration-500 motion-safe:group-hover:scale-105"
-                    loading="lazy"
-                    @load="onImageLoad"
-                    @error="onImageError"
-                />
+                    loading="lazy" @load="onImageLoad" @error="onImageError" />
 
                 <!-- Hover Overlay -->
                 <div
@@ -120,8 +122,7 @@ const onImageError = () => {
 
             <!-- Content -->
             <CardContent class="p-3">
-                <h3 
-                    :title="displayTitle"
+                <h3 :title="displayTitle"
                     class="font-semibold text-foreground line-clamp-1 motion-safe:group-hover:text-primary motion-safe:transition-colors">
                     {{ displayTitle }}</h3>
                 <div class="flex justify-between items-center mt-1 text-xs text-muted-foreground">

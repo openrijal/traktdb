@@ -6,24 +6,13 @@ import AppSidebar from './AppSidebar.vue';
 vi.mock('lucide-vue-next', () => ({
     LayoutDashboard: { template: '<svg data-testid="icon-dashboard" />' },
     Library: { template: '<svg data-testid="icon-library" />' },
-    Settings: { template: '<svg data-testid="icon-settings" />' },
-    LogOut: { template: '<svg data-testid="icon-logout" />' },
     Users: { template: '<svg data-testid="icon-users" />' },
-    Search: { template: '<svg data-testid="icon-search" />' },
     Book: { template: '<svg data-testid="icon-book" />' },
-    Headphones: { template: '<svg data-testid="icon-headphones" />' }
-}));
-
-// Mock auth client
-vi.mock('@/lib/auth-client', () => ({
-    authClient: {
-        signOut: vi.fn(),
-    },
-}));
-
-// Mock Button component
-vi.mock('@/components/ui/button', () => ({
-    Button: { template: '<button><slot /></button>' }
+    Headphones: { template: '<svg data-testid="icon-headphones" />' },
+    Clapperboard: { template: '<svg data-testid="icon-clapperboard" />' },
+    Tv: { template: '<svg data-testid="icon-tv" />' },
+    Tablet: { template: '<svg data-testid="icon-tablet" />' },
+    ChevronDown: { template: '<svg data-testid="icon-chevron" />' },
 }));
 
 describe('AppSidebar', () => {
@@ -37,10 +26,10 @@ describe('AppSidebar', () => {
 
     it('renders library link', () => {
         const wrapper = mount(AppSidebar, {
-            props: { currentPath: '/library' }
+            props: { currentPath: '/library/movies' }
         });
         expect(wrapper.text()).toContain('Library');
-        expect(wrapper.find('a[href="/library"]').exists()).toBe(true);
+        expect(wrapper.find('a[href="/library/movies"]').exists()).toBe(true);
     });
 
     it('renders friends link', () => {
@@ -49,23 +38,6 @@ describe('AppSidebar', () => {
         });
         expect(wrapper.text()).toContain('Friends');
         expect(wrapper.find('a[href="/friends"]').exists()).toBe(true);
-    });
-
-    it('does NOT render settings link', () => {
-        const wrapper = mount(AppSidebar, {
-            props: { currentPath: '/dashboard' }
-        });
-        // Settings link was removed from the list
-        expect(wrapper.find('a[href="/settings"]').exists()).toBe(false);
-    });
-
-    it('does NOT render logout button', () => {
-        const wrapper = mount(AppSidebar, {
-            props: { currentPath: '/dashboard' }
-        });
-        // Logout button was removed
-        expect(wrapper.text()).not.toContain('Sign Out');
-        expect(wrapper.find('[data-testid="icon-logout"]').exists()).toBe(false);
     });
 
     it('highlights active link', () => {
@@ -79,7 +51,19 @@ describe('AppSidebar', () => {
         expect(dashboardLink.classes()).toContain('bg-primary/10');
         expect(dashboardLink.classes()).toContain('text-primary');
 
-        const libraryLink = nav.find('a[href="/library"]');
+        const libraryLink = nav.find('a[href="/library/movies"]');
         expect(libraryLink.classes()).not.toContain('bg-primary/10');
+    });
+
+    it('renders library sub-menu items', () => {
+        const wrapper = mount(AppSidebar, {
+            props: { currentPath: '/library/movies' }
+        });
+
+        expect(wrapper.find('a[href="/library/movies"]').exists()).toBe(true);
+        expect(wrapper.find('a[href="/library/shows"]').exists()).toBe(true);
+        expect(wrapper.find('a[href="/library/podcasts"]').exists()).toBe(true);
+        expect(wrapper.find('a[href="/library/books"]').exists()).toBe(true);
+        expect(wrapper.find('a[href="/library/ebooks"]').exists()).toBe(true);
     });
 });

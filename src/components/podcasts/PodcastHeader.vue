@@ -51,7 +51,7 @@ const podcastDataForStatus = computed(() => ({
 
         <!-- Back Button -->
         <div class="absolute top-4 left-4 z-20 md:top-8 md:left-8">
-            <a href="/library?type=podcast"
+            <a href="/library/podcasts"
                 class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-background/20 backdrop-blur-md border border-white/10 hover:bg-background/40 transition-colors text-sm font-medium text-foreground">
                 <ArrowLeft class="w-4 h-4" />
                 <span>Back</span>

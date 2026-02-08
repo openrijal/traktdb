@@ -13,6 +13,7 @@ const props = defineProps<{
         artworkUrl600?: string;
         artworkUrl100?: string;
     };
+    linkPrefix?: string;
 }>();
 
 // ... existing code ...
@@ -34,11 +35,16 @@ const onImageError = () => {
 const externalId = computed(() => {
     return props.podcast.id || props.podcast.collectionId?.toString() || '';
 });
+
+const linkPath = computed(() => {
+    const prefix = props.linkPrefix || '/podcasts';
+    return `${prefix}/${externalId.value}`;
+});
 </script>
 
 <template>
     <div class="group block relative">
-        <a :href="`/podcasts/${externalId}`" class="block h-full">
+        <a :href="linkPath" class="block h-full">
             <Card
                 class="overflow-hidden border-0 bg-card shadow-md motion-safe:transition-all motion-safe:duration-300 motion-safe:hover:-translate-y-1 hover:shadow-lg h-full">
 

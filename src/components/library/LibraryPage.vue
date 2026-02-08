@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { Clapperboard, Tv, Book, Tablet, Headphones, Search as SearchIcon } from 'lucide-vue-next';
 import { cn } from '@/lib/utils';
 import MediaCard from '@/components/media/MediaCard.vue';
@@ -15,18 +15,41 @@ import {
     ListenStatusLabels,
 } from '@/lib/constants';
 
+const props = defineProps<{ initialSection?: string }>();
+
 const items = ref<any[]>([]);
 const isLoading = ref(false);
 const currentType = ref<MediaType>(MediaType.MOVIE);
 const currentStatus = ref<string>('');
 
+const sectionToType: Record<string, MediaType> = {
+    movies: MediaType.MOVIE,
+    shows: MediaType.TV,
+    books: MediaType.BOOK,
+    ebooks: MediaType.EBOOK,
+    podcasts: MediaType.PODCAST,
+};
+
+const typeToSection: Record<MediaType, string> = {
+    [MediaType.MOVIE]: 'movies',
+    [MediaType.TV]: 'shows',
+    [MediaType.BOOK]: 'books',
+    [MediaType.EBOOK]: 'ebooks',
+    [MediaType.PODCAST]: 'podcasts',
+    [MediaType.PERSON]: 'person',
+};
+
+if (props.initialSection && sectionToType[props.initialSection]) {
+    currentType.value = sectionToType[props.initialSection];
+}
+
 // Media type tabs
 const mediaTabs = [
-    { id: MediaType.MOVIE, label: 'Movies', icon: Clapperboard },
-    { id: MediaType.TV, label: 'Series', icon: Tv },
-    { id: MediaType.BOOK, label: 'Books', icon: Book },
-    { id: MediaType.EBOOK, label: 'E-Books', icon: Tablet },
-    { id: MediaType.PODCAST, label: 'Podcasts', icon: Headphones },
+    { id: MediaType.MOVIE, label: 'Movies', icon: Clapperboard, slug: 'movies' },
+    { id: MediaType.TV, label: 'Shows', icon: Tv, slug: 'shows' },
+    { id: MediaType.BOOK, label: 'Books', icon: Book, slug: 'books' },
+    { id: MediaType.EBOOK, label: 'E-Books', icon: Tablet, slug: 'ebooks' },
+    { id: MediaType.PODCAST, label: 'Podcasts', icon: Headphones, slug: 'podcasts' },
 ];
 
 // Status tabs computed based on type
@@ -116,22 +139,31 @@ const switchStatus = (status: string) => {
 };
 
 const syncUrl = () => {
+    const section = typeToSection[currentType.value] || 'movies';
     const url = new URL(window.location.href);
-    url.searchParams.set('type', currentType.value);
-    url.searchParams.set('status', currentStatus.value);
+    url.pathname = `/library/${section}`;
+    if (currentStatus.value) {
+        url.searchParams.set('status', currentStatus.value);
+    } else {
+        url.searchParams.delete('status');
+    }
     window.history.replaceState({}, '', url.toString());
+    window.dispatchEvent(new CustomEvent('app:navigation', { detail: { path: url.pathname } }));
+};
+
+const getTypeFromPath = (pathname: string) => {
+    const parts = pathname.split('/').filter(Boolean);
+    const section = parts[0] === 'library' ? parts[1] : undefined;
+    if (section && sectionToType[section]) return sectionToType[section];
+    if (props.initialSection && sectionToType[props.initialSection]) return sectionToType[props.initialSection];
+    return MediaType.MOVIE;
 };
 
 // Initialize from URL params
 onMounted(() => {
     const params = new URLSearchParams(window.location.search);
-    const typeParam = params.get('type');
     const statusParam = params.get('status');
-
-    if (typeParam && Object.values(MediaType).includes(typeParam as MediaType)) {
-        currentType.value = typeParam as MediaType;
-    }
-
+    currentType.value = getTypeFromPath(window.location.pathname);
     currentStatus.value = statusParam || getDefaultStatus(currentType.value);
     fetchItems();
 });
@@ -189,7 +221,8 @@ const skeletonCount = 12;
             <template v-else-if="items.length > 0">
                 <!-- Movies & TV -->
                 <div v-if="isMediaType" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 md:gap-6">
-                    <MediaCard v-for="item in items" :key="item.id" :media="item" :type="currentType" />
+                    <MediaCard v-for="item in items" :key="item.id" :media="item" :type="currentType"
+                        linkPrefix="/library" />
                 </div>
 
                 <!-- Books & eBooks -->
@@ -201,7 +234,8 @@ const skeletonCount = 12;
                 <!-- Podcasts -->
                 <div v-else-if="isPodcast"
                     class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
-                    <PodcastCard v-for="item in items" :key="item.collectionId" :podcast="item" />
+                    <PodcastCard v-for="item in items" :key="item.collectionId" :podcast="item"
+                        linkPrefix="/library/podcasts" />
                 </div>
             </template>
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { User, Settings, LogOut } from 'lucide-vue-next';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -19,6 +19,8 @@ const props = defineProps<{
         email?: string;
     };
 }>();
+
+const open = ref(false);
 
 const initials = computed(() => {
     const name = props.user?.name;
@@ -44,18 +46,13 @@ const handleSignOut = async () => {
 </script>
 
 <template>
-    <DropdownMenu>
+    <DropdownMenu v-model:open="open">
         <DropdownMenuTrigger as-child>
             <button
                 class="relative flex h-8 w-8 items-center justify-center rounded-full ring-offset-background transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                aria-label="User menu"
-            >
+                aria-label="User menu" type="button">
                 <Avatar class="h-8 w-8 border border-primary/10">
-                    <AvatarImage
-                        v-if="props.user?.image"
-                        :src="props.user.image"
-                        :alt="props.user?.name || 'User'"
-                    />
+                    <AvatarImage v-if="props.user?.image" :src="props.user.image" :alt="props.user?.name || 'User'" />
                     <AvatarFallback class="bg-primary/20 text-xs font-medium text-primary">
                         <span v-if="initials">{{ initials }}</span>
                         <User v-else class="h-4 w-4 text-primary" />
@@ -83,10 +80,8 @@ const handleSignOut = async () => {
                 Settings
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem
-                class="text-destructive focus:text-destructive"
-                @click="handleSignOut"
-            >
+            <DropdownMenuItem class="text-muted-foreground focus:bg-primary/10 focus:text-primary"
+                @click="handleSignOut">
                 <LogOut class="h-4 w-4" />
                 Log out
             </DropdownMenuItem>

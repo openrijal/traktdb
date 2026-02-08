@@ -7,11 +7,15 @@ const props = defineProps<{ user?: { name?: string | null; image?: string | null
 </script>
 
 <template>
-    <header class="flex h-14 items-center gap-4 bg-background px-6 justify-between border-b border-border/50">
-        <div class="flex-1 flex justify-center">
-            <OmniSearch />
+    <header
+        class="flex h-16 items-center gap-4 bg-background/80 px-6 justify-between border-b border-border/40 backdrop-blur"
+    >
+        <div class="flex flex-1 justify-center">
+            <div class="w-full max-w-2xl">
+                <OmniSearch />
+            </div>
         </div>
-        <div class="flex items-center gap-4 flex-shrink-0">
+        <div class="flex items-center gap-3 flex-shrink-0">
             <ThemeToggle />
             <UserMenu :user="props.user" />
         </div>
