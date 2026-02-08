@@ -86,4 +86,18 @@ describe('API: /api/profile/genres', () => {
         expect(mockDb.delete).toHaveBeenCalled();
         expect(mockDb.insert).toHaveBeenCalled();
     });
+
+    it('caps genres to 12 entries', async () => {
+        mockAuth.api.getSession.mockResolvedValue(mockSession);
+        const req = createTestRequest('/api/profile/genres', {
+            method: 'POST',
+            body: {
+                genres: Array.from({ length: 20 }, (_, i) => `Genre ${i + 1}`),
+            },
+        });
+        const res = await POST({ request: req, locals: {} } as any);
+        const data = await res.json();
+        expect(res.status).toBe(200);
+        expect(data.genres).toHaveLength(12);
+    });
 });
