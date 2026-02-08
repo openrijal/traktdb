@@ -24,6 +24,7 @@ describe('FontSizeToggle', () => {
     it('defaults to small and sets data-font-size', async () => {
         mount(FontSizeToggle);
         expect(document.documentElement.getAttribute('data-font-size')).toBe('small');
+        expect(document.documentElement.style.fontSize).toBe('16px');
     });
 
     it('persists selection to localStorage and updates data attribute', async () => {
@@ -33,5 +34,6 @@ describe('FontSizeToggle', () => {
 
         expect(store['font-size']).toBe('medium');
         expect(document.documentElement.getAttribute('data-font-size')).toBe('medium');
+        expect(document.documentElement.style.fontSize).toBe('17px');
     });
 });

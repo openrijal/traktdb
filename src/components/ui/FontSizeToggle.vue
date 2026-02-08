@@ -5,12 +5,18 @@ import { cn } from '@/lib/utils';
 type FontSize = 'small' | 'medium' | 'large';
 
 const STORAGE_KEY = 'font-size';
+const SIZE_TO_PX: Record<FontSize, string> = {
+    small: '16px',
+    medium: '17px',
+    large: '18px',
+};
 
 const currentSize = ref<FontSize>('small');
 
 const applySize = (size: FontSize) => {
     const html = document.documentElement;
     html.setAttribute('data-font-size', size);
+    html.style.fontSize = SIZE_TO_PX[size];
 };
 
 const setSize = (size: FontSize) => {
