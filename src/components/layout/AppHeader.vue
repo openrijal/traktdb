@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import OmniSearch from '@/components/search/OmniSearch.vue';
 import ThemeToggle from '@/components/ui/ThemeToggle.vue';
+import FontSizeToggle from '@/components/ui/FontSizeToggle.vue';
 import UserMenu from '@/components/layout/UserMenu.vue';
 
 const props = defineProps<{ user?: { name?: string | null; image?: string | null; email?: string; }; }>();
@@ -16,6 +17,7 @@ const props = defineProps<{ user?: { name?: string | null; image?: string | null
             </div>
         </div>
         <div class="flex items-center gap-3 flex-shrink-0">
+            <FontSizeToggle />
             <ThemeToggle />
             <UserMenu :user="props.user" />
         </div>
