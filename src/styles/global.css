@@ -253,6 +253,22 @@
    BASE STYLES
    ============================================ */
 
+html {
+  font-size: var(--font-base, 16px);
+}
+
+:root[data-font-size="small"] {
+  --font-base: 16px;
+}
+
+:root[data-font-size="medium"] {
+  --font-base: 17px;
+}
+
+:root[data-font-size="large"] {
+  --font-base: 18px;
+}
+
 body {
   @apply bg-background text-foreground antialiased border-border;
   font-feature-settings: "rlig" 1, "calt" 1;

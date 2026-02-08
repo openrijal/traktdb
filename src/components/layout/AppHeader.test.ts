@@ -11,6 +11,10 @@ vi.mock('@/components/ui/ThemeToggle.vue', () => ({
     default: { template: '<div data-testid="theme-toggle"></div>' }
 }));
 
+vi.mock('@/components/ui/FontSizeToggle.vue', () => ({
+    default: { template: '<div data-testid="font-size-toggle"></div>' }
+}));
+
 vi.mock('@/components/layout/UserMenu.vue', () => ({
     default: {
         template: '<div data-testid="user-menu"></div>',
@@ -40,6 +44,11 @@ describe('AppHeader.vue', () => {
     it('renders ThemeToggle component', () => {
         const wrapper = mount(AppHeader);
         expect(wrapper.find('[data-testid="theme-toggle"]').exists()).toBe(true);
+    });
+
+    it('renders FontSizeToggle component', () => {
+        const wrapper = mount(AppHeader);
+        expect(wrapper.find('[data-testid="font-size-toggle"]').exists()).toBe(true);
     });
 
     it('renders UserMenu component', () => {
