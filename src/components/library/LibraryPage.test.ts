@@ -12,7 +12,10 @@ vi.mock('@/components/books/BookCard.vue', () => ({
     default: { template: '<div class="mock-book-card" />' },
 }));
 vi.mock('@/components/podcasts/PodcastCard.vue', () => ({
-    default: { template: '<div class="mock-podcast-card" />' },
+    default: {
+        template: '<div class="mock-podcast-card" />',
+        props: ['linkPrefix', 'podcast']
+    },
 }));
 
 const mockMovieItems = {
@@ -140,5 +143,28 @@ describe('LibraryPage', () => {
         expect(fetchSpy).toHaveBeenCalledWith(
             expect.stringContaining('/api/library/items?type=book&status=reading'),
         );
+    });
+    it('passes correct linkPrefix to PodcastCard', async () => {
+        Object.defineProperty(window, 'location', {
+            value: { pathname: '/library/podcasts' },
+            writable: true
+        });
+
+        vi.spyOn(global, 'fetch').mockResolvedValue({
+            ok: true,
+            json: () => Promise.resolve({
+                items: [{ collectionId: 1, title: 'Test Podcast' }],
+                type: 'podcast',
+                total: 1
+            }),
+        } as Response);
+
+        const wrapper = mount(LibraryPage);
+        await vi.dynamicImportSettled();
+        await new Promise((r) => setTimeout(r, 10));
+
+        const podcastCard = wrapper.findComponent({ name: 'PodcastCard' });
+        expect(podcastCard.exists()).toBe(true);
+        expect(podcastCard.props('linkPrefix')).toBe('/library/podcasts');
     });
 });

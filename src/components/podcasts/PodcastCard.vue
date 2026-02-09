@@ -37,7 +37,7 @@ const externalId = computed(() => {
 });
 
 const linkPath = computed(() => {
-    const prefix = props.linkPrefix || '/podcasts';
+    const prefix = props.linkPrefix || '/library/podcasts';
     return `${prefix}/${externalId.value}`;
 });
 </script>
