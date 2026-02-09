@@ -1,4 +1,3 @@
-
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue';
 import { useDebounceFn } from '@vueuse/core';
@@ -163,6 +162,7 @@ const convertPodcasts = (items: OmniResult[]) =>
         collectionName: item.title,
         artistName: item.subtitle || '',
         artworkUrl600: item.image || undefined,
+        url: `/library/podcasts/${item.id}`,
     }));
 
 // Dedicated category search for load-more within a single tab
@@ -391,70 +391,43 @@ onMounted(() => {
     <div class="w-full space-y-6">
         <!-- Search Input -->
         <div class="relative max-w-2xl mx-auto">
-            <SearchIcon
-                class="absolute left-4 top-3.5 h-5 w-5 text-muted-foreground pointer-events-none"
-            />
-            <Input
-                type="search"
-                v-model="query"
-                @input="handleInput"
+            <SearchIcon class="absolute left-4 top-3.5 h-5 w-5 text-muted-foreground pointer-events-none" />
+            <Input type="search" v-model="query" @input="handleInput"
                 placeholder="Search movies, TV shows, books, podcasts..."
                 class="pl-12 h-12 text-lg bg-card/50 border-border rounded-xl focus-visible:ring-primary/50 transition-all shadow-lg"
-                autofocus
-            />
+                autofocus />
             <div v-if="isLoading" class="absolute right-4 top-4">
                 <Loader2 class="h-5 w-5 animate-spin text-primary" />
             </div>
         </div>
 
         <!-- Results count -->
-        <p
-            v-if="hasSearched && !isLoading && omniResponse"
-            class="text-sm text-muted-foreground text-center"
-        >
+        <p v-if="hasSearched && !isLoading && omniResponse" class="text-sm text-muted-foreground text-center">
             {{ totalResultsCount }} results for
             <span class="font-medium text-foreground">"{{ query }}"</span>
         </p>
 
         <!-- Category Tabs -->
-        <div
-            v-if="hasSearched && omniResponse"
-            class="flex flex-wrap gap-2 justify-center"
-        >
-            <button
-                v-for="tab in tabs"
-                :key="tab.key"
-                @click="switchTab(tab.key)"
-                :class="
-                    cn(
-                        'inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all border',
-                        currentTab === tab.key
-                            ? 'bg-primary text-primary-foreground border-primary shadow-md'
-                            : 'bg-transparent text-muted-foreground border-border hover:border-primary/50 hover:text-foreground hover:bg-muted/50',
-                    )
-                "
-            >
+        <div v-if="hasSearched && omniResponse" class="flex flex-wrap gap-2 justify-center">
+            <button v-for="tab in tabs" :key="tab.key" @click="switchTab(tab.key)" :class="cn(
+                'inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all border',
+                currentTab === tab.key
+                    ? 'bg-primary text-primary-foreground border-primary shadow-md'
+                    : 'bg-transparent text-muted-foreground border-border hover:border-primary/50 hover:text-foreground hover:bg-muted/50',
+            )
+                ">
                 <component :is="tab.icon" class="w-4 h-4" />
                 {{ tab.label }}
-                <span
-                    v-if="tab.key !== 'all' && tabCounts[tab.key]"
-                    class="ml-0.5 text-xs opacity-70"
-                >
+                <span v-if="tab.key !== 'all' && tabCounts[tab.key]" class="ml-0.5 text-xs opacity-70">
                     ({{ tabCounts[tab.key] }})
                 </span>
             </button>
         </div>
 
         <!-- Loading Skeleton -->
-        <div
-            v-if="isLoading"
-            class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6"
-        >
-            <div
-                v-for="i in skeletonCount"
-                :key="i"
-                class="bg-muted animate-pulse rounded-lg aspect-[2/3]"
-            />
+        <div v-if="isLoading"
+            class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
+            <div v-for="i in skeletonCount" :key="i" class="bg-muted animate-pulse rounded-lg aspect-[2/3]" />
         </div>
 
         <!-- "All" tab: sectioned results -->
@@ -462,57 +435,34 @@ onMounted(() => {
             <div v-for="section in allSections" :key="section.key" class="space-y-4">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2">
-                        <component
-                            :is="section.icon"
-                            class="w-5 h-5 text-muted-foreground"
-                        />
+                        <component :is="section.icon" class="w-5 h-5 text-muted-foreground" />
                         <h2 class="text-lg font-semibold text-foreground">
                             {{ section.label }}
                         </h2>
                     </div>
-                    <button
-                        @click="switchTab(section.key)"
-                        class="text-sm text-primary hover:text-primary/80 transition-colors"
-                    >
+                    <button @click="switchTab(section.key)"
+                        class="text-sm text-primary hover:text-primary/80 transition-colors">
                         View all →
                     </button>
                 </div>
 
                 <!-- Movies / TV grid -->
-                <div
-                    v-if="section.key === 'movies' || section.key === 'tv'"
-                    class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6"
-                >
-                    <MediaCard
-                        v-for="item in section.items"
-                        :key="item.id"
-                        :media="item"
-                        :type="section.key === 'tv' ? MediaType.TV : MediaType.MOVIE"
-                    />
+                <div v-if="section.key === 'movies' || section.key === 'tv'"
+                    class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
+                    <MediaCard v-for="item in section.items" :key="item.id" :media="item"
+                        :type="section.key === 'tv' ? MediaType.TV : MediaType.MOVIE" />
                 </div>
 
                 <!-- Books grid -->
-                <div
-                    v-else-if="section.key === 'books'"
-                    class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6"
-                >
-                    <BookCard
-                        v-for="item in section.items"
-                        :key="item.id"
-                        :book="item"
-                    />
+                <div v-else-if="section.key === 'books'"
+                    class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
+                    <BookCard v-for="item in section.items" :key="item.id" :book="item" />
                 </div>
 
                 <!-- Podcasts grid -->
-                <div
-                    v-else-if="section.key === 'podcasts'"
-                    class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6"
-                >
-                    <PodcastCard
-                        v-for="item in section.items"
-                        :key="item.collectionId"
-                        :podcast="item"
-                    />
+                <div v-else-if="section.key === 'podcasts'"
+                    class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
+                    <PodcastCard v-for="item in section.items" :key="item.collectionId" :podcast="item" />
                 </div>
             </div>
         </template>
@@ -520,112 +470,69 @@ onMounted(() => {
         <!-- Single category tab: full grid -->
         <template v-else-if="currentTab !== 'all' && hasSearched">
             <!-- Movies -->
-            <div
-                v-if="currentTab === 'movies'"
-                class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6"
-            >
-                <MediaCard
-                    v-for="item in categoryResults.movies"
-                    :key="item.id"
-                    :media="item"
-                    :type="MediaType.MOVIE"
-                />
+            <div v-if="currentTab === 'movies'"
+                class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
+                <MediaCard v-for="item in categoryResults.movies" :key="item.id" :media="item"
+                    :type="MediaType.MOVIE" />
             </div>
 
             <!-- TV -->
-            <div
-                v-if="currentTab === 'tv'"
-                class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6"
-            >
-                <MediaCard
-                    v-for="item in categoryResults.tv"
-                    :key="item.id"
-                    :media="item"
-                    :type="MediaType.TV"
-                />
+            <div v-if="currentTab === 'tv'"
+                class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
+                <MediaCard v-for="item in categoryResults.tv" :key="item.id" :media="item" :type="MediaType.TV" />
             </div>
 
             <!-- Books -->
-            <div
-                v-if="currentTab === 'books'"
-                class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6"
-            >
-                <BookCard
-                    v-for="item in categoryResults.books"
-                    :key="item.id"
-                    :book="item"
-                />
+            <div v-if="currentTab === 'books'"
+                class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
+                <BookCard v-for="item in categoryResults.books" :key="item.id" :book="item" />
             </div>
 
             <!-- Podcasts -->
-            <div
-                v-if="currentTab === 'podcasts'"
-                class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6"
-            >
-                <PodcastCard
-                    v-for="item in categoryResults.podcasts"
-                    :key="item.collectionId"
-                    :podcast="item"
-                />
+            <div v-if="currentTab === 'podcasts'"
+                class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
+                <PodcastCard v-for="item in categoryResults.podcasts" :key="item.collectionId" :podcast="item" />
             </div>
 
             <!-- Category loading -->
-            <div
-                v-if="categoryLoading[currentTab]"
-                class="flex justify-center py-8"
-            >
+            <div v-if="categoryLoading[currentTab]" class="flex justify-center py-8">
                 <Loader2 class="h-6 w-6 animate-spin text-primary" />
             </div>
 
             <!-- Load More -->
-            <div
-                v-if="
-                    !categoryLoading[currentTab] &&
-                    categoryHasMore[currentTab] &&
-                    categoryResults[currentTab].length > 0
-                "
-                class="flex justify-center pt-4"
-            >
-                <button
-                    @click="loadMore(currentTab)"
-                    class="px-6 py-2.5 text-sm font-medium text-primary border border-primary/50 rounded-full hover:bg-primary/10 transition-colors"
-                >
+            <div v-if="
+                !categoryLoading[currentTab] &&
+                categoryHasMore[currentTab] &&
+                categoryResults[currentTab].length > 0
+            " class="flex justify-center pt-4">
+                <button @click="loadMore(currentTab)"
+                    class="px-6 py-2.5 text-sm font-medium text-primary border border-primary/50 rounded-full hover:bg-primary/10 transition-colors">
                     Load more
                 </button>
             </div>
 
             <!-- Empty category -->
-            <div
-                v-if="
-                    !categoryLoading[currentTab] &&
-                    categoryResults[currentTab].length === 0
-                "
-                class="text-center py-16 text-muted-foreground"
-            >
-                <component
-                    :is="tabs.find((t) => t.key === currentTab)?.icon || SearchIcon"
-                    class="w-12 h-12 mx-auto mb-4 opacity-20"
-                />
-                <p class="text-lg">No {{ tabs.find((t) => t.key === currentTab)?.label || '' }} found</p>
+            <div v-if="
+                !categoryLoading[currentTab] &&
+                categoryResults[currentTab].length === 0
+            " class="text-center py-16 text-muted-foreground">
+                <component :is="tabs.find((t) => t.key === currentTab)?.icon || SearchIcon"
+                    class="w-12 h-12 mx-auto mb-4 opacity-20" />
+                <p class="text-lg">No {{tabs.find((t) => t.key === currentTab)?.label || ''}} found</p>
                 <p class="text-sm mt-1">Try a different search term</p>
             </div>
         </template>
 
         <!-- No Results State -->
-        <div
-            v-else-if="hasSearched && !isLoading && omniResponse && totalResultsCount === 0"
-            class="text-center py-20 text-muted-foreground"
-        >
+        <div v-else-if="hasSearched && !isLoading && omniResponse && totalResultsCount === 0"
+            class="text-center py-20 text-muted-foreground">
             <SearchIcon class="w-16 h-16 mx-auto mb-4 opacity-20" />
             <h3 class="text-lg font-medium">No results found</h3>
             <p>Try adjusting your search query</p>
         </div>
 
         <!-- Empty State -->
-        <div
-            v-else-if="!hasSearched && !isLoading"
-            class="text-center py-32 text-muted-foreground"
-        >
+        <div v-else-if="!hasSearched && !isLoading" class="text-center py-32 text-muted-foreground">
             <SearchIcon class="w-20 h-20 mx-auto mb-6 opacity-10" />
             <h2 class="text-2xl font-semibold text-secondary-foreground mb-2">
                 Search TracktDB

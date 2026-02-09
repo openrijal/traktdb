@@ -1,6 +1,7 @@
 ---
 import AppLayout from "@/layouts/AppLayout.astro";
 import ProfileForm from "@/components/profile/ProfileForm.vue";
+import TraktConnection from "@/components/settings/TraktConnection.vue";
 
 const { user } = Astro.locals;
 
@@ -20,6 +21,16 @@ if (!user) {
             </div>
             <div class="h-px bg-border"></div>
             <ProfileForm client:load initialUser={user} />
+            <div class="h-px bg-border"></div>
+            <div class="space-y-4">
+                <div>
+                    <h4 class="text-base font-medium">Connected Accounts</h4>
+                    <p class="text-sm text-muted-foreground">
+                        Manage integrations connected to your TraktDB profile.
+                    </p>
+                </div>
+                <TraktConnection client:load />
+            </div>
         </div>
     </div>
 </AppLayout>

@@ -247,3 +247,13 @@ export const userPodcastEpisodeProgress = pgTable('user_podcast_episode_progress
 }, (t) => ({
     unq: uniqueIndex('user_podcast_episode_progress_unique').on(t.userId, t.episodeId),
 }));
+
+export const userGenreInterests = pgTable('user_genre_interests', {
+    id: serial('id').primaryKey(),
+    userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+    genre: text('genre').notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}, (t) => ({
+    unq: uniqueIndex('user_genre_interests_user_genre_unique').on(t.userId, t.genre),
+}));
