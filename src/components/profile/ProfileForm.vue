@@ -155,18 +155,12 @@ watch(
       </div>
 
       <div class="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-        <button
-          v-for="genre in GENRES"
-          :key="genre"
-          type="button"
-          :class="cn(
-            'rounded-full border px-3 py-1.5 text-sm font-medium transition-colors',
-            selectedGenres.includes(genre)
-              ? 'border-primary bg-primary/10 text-primary'
-              : 'border-border/60 text-muted-foreground hover:text-foreground hover:border-primary/40'
-          )"
-          @click="toggleGenre(genre)"
-        >
+        <button v-for="genre in GENRES" :key="genre" type="button" :class="cn(
+          'rounded-full border px-3 py-1.5 text-sm font-medium transition-colors',
+          selectedGenres.includes(genre)
+            ? 'border-primary bg-primary/10 text-primary'
+            : 'border-border/60 text-muted-foreground hover:text-foreground hover:border-primary/40'
+        )" @click="toggleGenre(genre)">
           {{ genre }}
         </button>
       </div>

@@ -76,7 +76,7 @@ onBeforeUnmount(() => {
 
 <template>
     <div class="border-b border-border/50 bg-card/40 backdrop-blur">
-        <div class="mx-auto flex max-w-7xl items-center gap-3 px-6 py-3">
+        <div class="flex items-center gap-3 px-4 py-3 md:px-6 lg:px-8">
             <nav aria-label="Breadcrumb" class="flex items-center gap-2 text-xs text-muted-foreground">
                 <template v-for="(crumb, index) in breadcrumbs" :key="crumb.href">
                     <a :href="crumb.href" :class="cn(

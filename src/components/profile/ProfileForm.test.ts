@@ -100,9 +100,9 @@ describe('ProfileForm', () => {
 
         const genreButtons = wrapper.findAll('button').filter((b) =>
             [
-                'Action','Adventure','Animation','Comedy','Crime','Documentary',
-                'Drama','Family','Fantasy','History','Horror','Music','Mystery',
-                'Romance','Sci-Fi','Thriller','TV Movie','War','Western'
+                'Action', 'Adventure', 'Animation', 'Comedy', 'Crime', 'Documentary',
+                'Drama', 'Family', 'Fantasy', 'History', 'Horror', 'Music', 'Mystery',
+                'Romance', 'Sci-Fi', 'Thriller', 'TV Movie', 'War', 'Western'
             ].includes(b.text())
         );
 
